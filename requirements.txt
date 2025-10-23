@@ -292,3 +292,4 @@ xyzservices==2025.4.0
 yarl==1.20.0
 zipp==1.0.0
 zstandard==0.23.0
+gunicorn==21.2.0
