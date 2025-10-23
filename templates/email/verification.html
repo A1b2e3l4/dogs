@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #8B7355, #a88c6c);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+        .verification-code {
+            background: #8B7355;
+            color: white;
+            padding: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 8px;
+            letter-spacing: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .button {
+            display: inline-block;
+            background: #8B7355;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Woofcare</h1>
+        <p>Find Your Perfect Companion</p>
+    </div>
+    
+    <div class="content">
+        <h2>Verify Your Email Address</h2>
+        <p>Hello!</p>
+        <p>Thank you for joining Woofcare! To complete your registration and start browsing our lovely dogs, please verify your email address using the code below:</p>
+        
+        <div class="verification-code">
+            {{ verification_code }}
+        </div>
+        
+        <p>Enter this code on the verification page to activate your account. This code will expire in 1 hour for security reasons.</p>
+        
+        <p>If you didn't create an account with Woofcare, please ignore this email.</p>
+        
+        <p>Best regards,<br>The Woofcare Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2025 Woofcare. All rights reserved.</p>
+        <p>Nairobi, Kenya</p>
+        <p>
+            <a href="https://woofcare.com" style="color: #8B7355;">Visit Website</a> | 
+            <a href="mailto:support@woofcare.com" style="color: #8B7355;">Contact Support</a>
+        </p>
+    </div>
+</body>
+</html>

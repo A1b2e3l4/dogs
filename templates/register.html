@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2>Join Woofcare</h2>
+        <form method="POST" onsubmit="return validateForm(this)">
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" required 
+                       value="{{ request.form.first_name if request.form }}">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" required
+                       value="{{ request.form.last_name if request.form }}">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required
+                       value="{{ request.form.email if request.form }}">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required 
+                       placeholder="e.g., 254712345678"
+                       value="{{ request.form.phone if request.form }}">
+                <small style="color: #666;">Enter your M-Pesa registered number</small>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required 
+                       minlength="6">
+                <small style="color: #666;">Must be at least 6 characters long</small>
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">Create Account</button>
+        </form>
+        <p style="text-align: center; margin-top: 1rem;">
+            Already have an account? <a href="{{ url_for('login') }}">Login here</a>
+        </p>
+    </div>
+</div>
+
+<script>
+function validateForm(form) {
+    const password = form.querySelector('#password');
+    const confirmPassword = form.querySelector('#confirm_password');
+    const phone = form.querySelector('#phone');
+    
+    // Validate password match
+    if (password.value !== confirmPassword.value) {
+        alert('Passwords do not match');
+        confirmPassword.style.borderColor = 'var(--error-color)';
+        return false;
+    }
+    
+    // Validate password length
+    if (password.value.length < 6) {
+        alert('Password must be at least 6 characters long');
+        password.style.borderColor = 'var(--error-color)';
+        return false;
+    }
+    
+    // Validate phone number format
+    const phoneRegex = /^(254|0)?[17]\d{8}$/;
+    let phoneValue = phone.value.replace(/\D/g, '');
+    
+    if (phoneValue.startsWith('0')) {
+        phoneValue = '254' + phoneValue.substring(1);
+    }
+    
+    if (!phoneRegex.test(phoneValue)) {
+        alert('Please enter a valid Kenyan phone number');
+        phone.style.borderColor = 'var(--error-color)';
+        return false;
+    }
+    
+    // Format phone number for submission
+    phone.value = phoneValue;
+    
+    return true;
+}
+
+// Real-time password confirmation validation
+document.addEventListener('DOMContentLoaded', function() {
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    if (confirmPassword) {
+        confirmPassword.addEventListener('input', function() {
+            if (password.value !== confirmPassword.value) {
+                confirmPassword.style.borderColor = 'var(--error-color)';
+            } else {
+                confirmPassword.style.borderColor = '';
+            }
+        });
+    }
+    
+    // Phone number formatting
+    const phoneInput = document.getElementById('phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.startsWith('0')) {
+                value = '254' + value.substring(1);
+            }
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

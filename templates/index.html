@@ -1,0 +1,1500 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Find Your Perfect Canine Companion</h1>
+            <p class="hero-subtitle">Discover loving dogs from 30+ premium breeds waiting for their forever homes at Woofcare</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('dogs') }}" class="btn btn-primary btn-large">Browse All Dogs</a>
+                <a href="#all-breeds" class="btn btn-secondary btn-large">Explore All Breeds</a>
+            </div>
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">30+</span>
+                    <span class="stat-label">Premium Breeds</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Health Guaranteed</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Expert Support</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Dogs Section -->
+<section class="featured-dogs">
+    <div class="container">
+        <div class="section-header">
+            <h2>Currently Available Dogs</h2>
+            <p>Meet our wonderful dogs looking for loving homes</p>
+        </div>
+        
+        <div class="dogs-grid">
+            {% for dog in dogs %}
+            <div class="dog-card featured">
+                <div class="dog-image">
+                    {% if dog.image_url %}
+                    <img src="{{ dog.image_url }}" alt="{{ dog.name }}" loading="lazy">
+                    {% else %}
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">🐕</span>
+                    </div>
+                    {% endif %}
+                    <div class="featured-badge">Available</div>
+                </div>
+                <div class="dog-info">
+                    <div class="dog-header">
+                        <h3 class="dog-name">{{ dog.name }}</h3>
+                        <span class="dog-breed">{{ dog.breed }}</span>
+                    </div>
+                    <div class="dog-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Age:</span>
+                            <span class="detail-value">{{ dog.age }} year{{ 's' if dog.age != 1 }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Size:</span>
+                            <span class="detail-value">{{ dog.size|title }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Energy:</span>
+                            <span class="detail-value energy-{{ dog.energy_level }}">{{ dog.energy_level|title }}</span>
+                        </div>
+                    </div>
+                    <div class="price">KES {{ "{:,.0f}".format(dog.price) }}</div>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('dog_detail', dog_id=dog.id) }}" class="btn btn-outline">View Details</a>
+                        {% if dog.is_available %}
+                            {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('checkout', dog_id=dog.id) }}" class="btn btn-primary">Adopt Now</a>
+                            {% else %}
+                            <a href="{{ url_for('login', next=url_for('checkout', dog_id=dog.id)) }}" class="btn btn-primary">Login to Adopt</a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="section-footer">
+            <a href="{{ url_for('dogs') }}" class="btn btn-large btn-outline">
+                View All Available Dogs
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- All Breeds Showcase Section -->
+<section id="all-breeds" class="all-breeds-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Explore Our 30+ Premium Dog Breeds</h2>
+            <p>Discover the perfect breed for your lifestyle and family</p>
+        </div>
+
+        <!-- Family-Friendly Breeds -->
+        <div class="breed-category">
+            <div class="category-header">
+                <div class="category-icon">🐕</div>
+                <h3>Family-Friendly Breeds</h3>
+                <p>Perfect for families with children and first-time owners</p>
+            </div>
+            <div class="breeds-grid">
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/Labrador.jpg') }}" alt="Labrador Retriever" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 25,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Labrador Retriever</h4>
+                        <p class="breed-temperament">Friendly, Active, Outgoing</p>
+                        <p class="breed-desc">Intelligent and gentle family companions perfect for active households.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Kid-Friendly: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/Golden_Retriever.jpg') }}" alt="Golden Retriever" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 30,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Golden Retriever</h4>
+                        <p class="breed-temperament">Intelligent, Kind, Trustworthy</p>
+                        <p class="breed-desc">Patient and devoted family dogs known for their gentle nature.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Kid-Friendly: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/beagle.jpg') }}" alt="Beagle" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 20,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Beagle</h4>
+                        <p class="breed-temperament">Curious, Friendly, Merry</p>
+                        <p class="breed-desc">Curious and great with children, perfect for family adventures.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Medium</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Kid-Friendly: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/bulldog.jpg') }}" alt="Bulldog" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 35,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Bulldog</h4>
+                        <p class="breed-temperament">Calm, Courageous, Friendly</p>
+                        <p class="breed-desc">Gentle and low-energy companions perfect for apartment living.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Medium</span>
+                            <span class="stat">Energy: Low</span>
+                            <span class="stat">Kid-Friendly: Good</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/poodle.jpg') }}" alt="Poodle" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 28,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Poodle</h4>
+                        <p class="breed-temperament">Smart, Active, Instinctual</p>
+                        <p class="breed-desc">Highly intelligent and hypoallergenic, great for allergy sufferers.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Various</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Kid-Friendly: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Working & Guardian Breeds -->
+        <div class="breed-category">
+            <div class="category-header">
+                <div class="category-icon">🛡️</div>
+                <h3>Working & Guardian Breeds</h3>
+                <p>Loyal protectors and intelligent working companions</p>
+            </div>
+            <div class="breeds-grid">
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/german-shepherd.jpg') }}" alt="German Shepherd" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 30,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>German Shepherd</h4>
+                        <p class="breed-temperament">Loyal, Confident, Courageous</p>
+                        <p class="breed-desc">Highly intelligent and versatile working dogs with strong protective instincts.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Guardian: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/rottweiler.jpg') }}" alt="Rottweiler" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 32,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Rottweiler</h4>
+                        <p class="breed-temperament">Confident, Fearless, Good-natured</p>
+                        <p class="breed-desc">Powerful guardians with a natural protective instinct and loyalty.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Guardian: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/doberman.jpg') }}" alt="Doberman Pinscher" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 35,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Doberman Pinscher</h4>
+                        <p class="breed-temperament">Energetic, Watchful, Fearless</p>
+                        <p class="breed-desc">Athletic and intelligent protectors known for their loyalty.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Guardian: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/boxer.jpg') }}" alt="Boxer" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 28,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Boxer</h4>
+                        <p class="breed-temperament">Playful, Patient, Bright</p>
+                        <p class="breed-desc">Energetic and fun-loving family guardians with a playful spirit.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Kid-Friendly: Good</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/great-dane.jpg') }}" alt="Great Dane" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 40,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Great Dane</h4>
+                        <p class="breed-temperament">Gentle, Friendly, Patient</p>
+                        <p class="breed-desc">Gentle giants known for their majestic appearance and sweet nature.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Giant</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Kid-Friendly: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Small & Companion Breeds -->
+        <div class="breed-category">
+            <div class="category-header">
+                <div class="category-icon">🏠</div>
+                <h3>Small & Companion Breeds</h3>
+                <p>Perfect for apartment living and lap dog lovers</p>
+            </div>
+            <div class="breeds-grid">
+                <!-- Yorkshire Terrier, Chihuahua, Shih Tzu, Maltese, French Bulldog -->
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/yorkie.jpg') }}" alt="Yorkshire Terrier" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 25,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Yorkshire Terrier</h4>
+                        <p class="breed-temperament">Bold, Confident, Smart</p>
+                        <p class="breed-desc">Small but brave companions with big personalities.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Apartment: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/chihuahua.jpg') }}" alt="Chihuahua" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 18,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Chihuahua</h4>
+                        <p class="breed-temperament">Charming, Graceful, Sassy</p>
+                        <p class="breed-desc">Tiny dogs with huge personalities, perfect for city living.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Tiny</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Apartment: Perfect</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/shih-tzu.jpg') }}" alt="Shih Tzu" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 22,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Shih Tzu</h4>
+                        <p class="breed-temperament">Affectionate, Outgoing, Alert</p>
+                        <p class="breed-desc">Charming companion dogs bred for royalty and companionship.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: Low</span>
+                            <span class="stat">Apartment: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/maltese.jpg') }}" alt="Maltese" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 26,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Maltese</h4>
+                        <p class="breed-temperament">Gentle, Playful, Charming</p>
+                        <p class="breed-desc">Elegant and gentle lap dogs with a sweet disposition.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: Low</span>
+                            <span class="stat">Apartment: Perfect</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/french-bulldog.jpg') }}" alt="French Bulldog" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 45,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>French Bulldog</h4>
+                        <p class="breed-temperament">Adaptable, Bright, Playful</p>
+                        <p class="breed-desc">Popular apartment dogs known for their bat ears and charming personality.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: Low</span>
+                            <span class="stat">Apartment: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active & Herding Breeds -->
+        <div class="breed-category">
+            <div class="category-header">
+                <div class="category-icon">⚡</div>
+                <h3>Active & Herding Breeds</h3>
+                <p>Energetic companions for active lifestyles and outdoor adventures</p>
+            </div>
+            <div class="breeds-grid">
+                <!-- Border Collie, Australian Shepherd, Siberian Husky, Shetland Sheepdog, Irish Setter -->
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/border-collie.jpg') }}" alt="Border Collie" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 28,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Border Collie</h4>
+                        <p class="breed-temperament">Athletic, Smart, Energetic</p>
+                        <p class="breed-desc">The world's smartest dog breed, perfect for active owners.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Medium</span>
+                            <span class="stat">Energy: Very High</span>
+                            <span class="stat">Intelligence: Highest</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/australian-shepherd.jpg') }}" alt="Australian Shepherd" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 32,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Australian Shepherd</h4>
+                        <p class="breed-temperament">Smart, Work-oriented, Energetic</p>
+                        <p class="breed-desc">Versatile working dogs with stunning merle coats and high intelligence.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Medium</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Trainability: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/siberian-husky.jpg') }}" alt="Siberian Husky" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 30,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Siberian Husky</h4>
+                        <p class="breed-temperament">Loyal, Outgoing, Mischievous</p>
+                        <p class="breed-desc">Beautiful sled dogs known for their striking eyes and love of adventure.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: Very High</span>
+                            <span class="stat">Cold Weather: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/shetland-sheepdog.jpg') }}" alt="Shetland Sheepdog" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 26,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Shetland Sheepdog</h4>
+                        <p class="breed-temperament">Intelligent, Lively, Trainable</p>
+                        <p class="breed-desc">Miniature collies with big hearts and exceptional intelligence.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Intelligence: High</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/irish-setter.jpg') }}" alt="Irish Setter" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 29,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Irish Setter</h4>
+                        <p class="breed-temperament">Energetic, Playful, Outgoing</p>
+                        <p class="breed-desc">Beautiful red-coated hunters with endless energy and charm.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Active Family: Perfect</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unique & Special Breeds -->
+        <div class="breed-category">
+            <div class="category-header">
+                <div class="category-icon">🌟</div>
+                <h3>Unique & Special Breeds</h3>
+                <p>Distinctive dogs with unique characteristics and special qualities</p>
+            </div>
+            <div class="breeds-grid">
+                <!-- Dachshund, Cocker Spaniel, Saint Bernard, Bernese Mountain Dog, Greyhound -->
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/dachshund.jpg') }}" alt="Dachshund" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 20,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Dachshund</h4>
+                        <p class="breed-temperament">Curious, Brave, Spunky</p>
+                        <p class="breed-desc">"Wiener dogs" with long bodies and big personalities.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Unique: Long Body</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/cocker-spaniel.jpg') }}" alt="Cocker Spaniel" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 24,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Cocker Spaniel</h4>
+                        <p class="breed-temperament">Merry, Trusting, Gentle</p>
+                        <p class="breed-desc">Beautiful sporting dogs with silky coats and sweet dispositions.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Medium</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Family: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/saint-bernard.jpg') }}" alt="Saint Bernard" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 38,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Saint Bernard</h4>
+                        <p class="breed-temperament">Gentle, Calm, Friendly</p>
+                        <p class="breed-desc">Famous rescue dogs known for their massive size and gentle nature.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Giant</span>
+                            <span class="stat">Energy: Low</span>
+                            <span class="stat">Rescue: Legendary</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/bernese-mountain.jpg') }}" alt="Bernese Mountain Dog" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 42,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Bernese Mountain Dog</h4>
+                        <p class="breed-temperament">Good-natured, Calm, Strong</p>
+                        <p class="breed-desc">Beautiful tri-colored working dogs from the Swiss Alps.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Giant</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Family: Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/greyhound.jpg') }}" alt="Greyhound" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 27,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Greyhound</h4>
+                        <p class="breed-temperament">Gentle, Noble, Quiet</p>
+                        <p class="breed-desc">The world's fastest couch potatoes - surprisingly low energy indoors.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: Low (indoors)</span>
+                            <span class="stat">Speed: Fastest</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- More Wonderful Breeds -->
+        <div class="breed-category">
+            <div class="category-header">
+                <div class="category-icon">💫</div>
+                <h3>More Wonderful Breeds</h3>
+                <p>Additional amazing breeds to complete your search for the perfect companion</p>
+            </div>
+            <div class="breeds-grid">
+                <!-- Bichon Frisé, Akita, Pit Bull Terrier, Dalmatian, Pug -->
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/bichon.jpg') }}" alt="Bichon Frisé" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 23,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Bichon Frisé</h4>
+                        <p class="breed-temperament">Cheerful, Curious, Playful</p>
+                        <p class="breed-desc">Fluffy white companions known for their happy-go-lucky attitude.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Hypoallergenic: Yes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/akita.jpg') }}" alt="Akita" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 35,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Akita</h4>
+                        <p class="breed-temperament">Dignified, Courageous, Profoundly Loyal</p>
+                        <p class="breed-desc">Majestic Japanese guardians known for their unwavering loyalty.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: Medium</span>
+                            <span class="stat">Loyalty: Legendary</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/pitbull.jpg') }}" alt="Pit Bull Terrier" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 22,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Pit Bull Terrier</h4>
+                        <p class="breed-temperament">Strong, Confident, Friendly</p>
+                        <p class="breed-desc">Misunderstood companions with incredible loyalty and affection.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Medium</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Loyalty: Exceptional</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/dalmatian.jpg') }}" alt="Dalmatian" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 26,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Dalmatian</h4>
+                        <p class="breed-temperament">Energetic, Smart, Outgoing</p>
+                        <p class="breed-desc">Iconic spotted dogs known for their endurance and unique appearance.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Large</span>
+                            <span class="stat">Energy: High</span>
+                            <span class="stat">Unique: Spots</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="breed-card">
+                    <div class="breed-image">
+                        <img src="{{ url_for('static', filename='images/breeds/pug.jpg') }}" alt="Pug" loading="lazy">
+                        <div class="breed-overlay">
+                            <span class="breed-price">From KES 24,000</span>
+                        </div>
+                    </div>
+                    <div class="breed-info">
+                        <h4>Pug</h4>
+                        <p class="breed-temperament">Charming, Mischievous, Loving</p>
+                        <p class="breed-desc">"Multum in parvo" - a lot of dog in a small space with big personality.</p>
+                        <div class="breed-stats">
+                            <span class="stat">Size: Small</span>
+                            <span class="stat">Energy: Low</span>
+                            <span class="stat">Personality: Huge</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="process-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>How Woofcare Works</h2>
+            <p>Simple steps to bring home your new best friend</p>
+        </div>
+        
+        <div class="process-steps">
+            <div class="step">
+                <div class="step-icon">1</div>
+                <h3>Browse & Select</h3>
+                <p>Explore our 30+ breeds and find your perfect match based on breed characteristics, age, size, and personality.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon">2</div>
+                <h3>Virtual Meet & Greet</h3>
+                <p>Schedule a video call with your chosen dog and our experts to ensure it's the right fit for your family.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon">3</div>
+                <h3>Secure M-Pesa Payment</h3>
+                <p>Complete your adoption with secure M-Pesa payment. We only accept Kenyan Shillings for your convenience.</p>
+            </div>
+            
+            <div class="step">
+                <div class="step-icon">4</div>
+                <h3>Safe Delivery & Support</h3>
+                <p>We safely deliver your new companion anywhere in Kenya with all documentation and lifetime support.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Woofcare Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Why Choose Woofcare?</h2>
+            <p>Kenya's most trusted platform for premium dog adoption</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">🏥</div>
+                <h3>Health Guaranteed</h3>
+                <p>All our dogs come with complete health checks, up-to-date vaccinations, deworming, and a 30-day health guarantee.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <h3>Secure M-Pesa Payments</h3>
+                <p>100% secure M-Pesa transactions with instant confirmation and payment protection for your peace of mind.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">🚚</div>
+                <h3>Nationwide Delivery</h3>
+                <p>We safely deliver your new companion to your doorstep anywhere in Kenya with professional pet transport.</p>
+            </div>
+            
+            <div class="feature">
+                <div class="feature-icon">📞</div>
+                <h3>Lifetime Support</h3>
+                <p>24/7 customer support and lifetime advice from our veterinary experts for your dog's health and happiness.</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">⭐</div>
+                <h3>Premium Breeds</h3>
+                <p>Carefully selected from Kenya's finest breeders, ensuring quality, temperament, and breed standards.</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">📝</div>
+                <h3>Complete Documentation</h3>
+                <p>All necessary adoption papers, vaccination records, and pedigree certificates provided.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final Call to Action -->
+<section class="final-cta">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Meet Your New Best Friend?</h2>
+            <p>Join thousands of happy families across Kenya who found their perfect companion through Woofcare</p>
+            <div class="cta-actions">
+                <a href="{{ url_for('dogs') }}" class="btn btn-primary btn-large">Browse Available Dogs</a>
+                <a href="{{ url_for('register') }}" class="btn btn-secondary btn-large">Create Free Account</a>
+            </div>
+            <div class="cta-guarantee">
+                <span class="guarantee-badge">✅ 30-Day Health Guarantee</span>
+                <span class="guarantee-badge">🔒 Secure M-Pesa Payments</span>
+                <span class="guarantee-badge">🚚 Nationwide Delivery</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Hero Section */
+.hero {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 6rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Section Headers */
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.section-header p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Featured Dogs */
+.featured-dogs {
+    padding: 5rem 0;
+    background: var(--background-color);
+}
+
+.dogs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.dog-card.featured {
+    background: var(--background-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition);
+}
+
+.dog-card.featured:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+}
+
+.dog-image {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.dog-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.dog-card:hover .dog-image img {
+    transform: scale(1.05);
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder-icon {
+    font-size: 4rem;
+    opacity: 0.7;
+}
+
+.featured-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--success-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.dog-info {
+    padding: 1.5rem;
+}
+
+.dog-header {
+    margin-bottom: 1rem;
+}
+
+.dog-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.25rem;
+}
+
+.dog-breed {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dog-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.energy-low { color: var(--success-color); }
+.energy-medium { color: var(--warning-color); }
+.energy-high { color: var(--error-color); }
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.section-footer {
+    text-align: center;
+}
+
+/* All Breeds Section */
+.all-breeds-section {
+    padding: 5rem 0;
+    background: var(--secondary-color);
+}
+
+.breed-category {
+    margin-bottom: 4rem;
+}
+
+.category-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: var(--background-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+}
+
+.category-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.category-header h3 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.breeds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.breed-card {
+    background: var(--background-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.breed-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.breed-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.breed-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.breed-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    padding: 1rem;
+    color: white;
+}
+
+.breed-price {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.breed-info {
+    padding: 1.5rem;
+}
+
+.breed-info h4 {
+    font-size: 1.3rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.breed-temperament {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.breed-desc {
+    color: var(--text-light);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.breed-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.breed-stats .stat {
+    background: var(--secondary-color);
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* Process Section */
+.process-section {
+    padding: 5rem 0;
+    background: var(--background-color);
+}
+
+.process-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.step {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.step-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0 auto 1.5rem auto;
+    transition: var(--transition);
+}
+
+.step:hover .step-icon {
+    transform: scale(1.1);
+    background: var(--primary-dark);
+}
+
+.step h3 {
+    font-size: 1.3rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.step p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* Features Section */
+.features-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+}
+
+.features-section .section-header h2 {
+    color: white;
+}
+
+.features-section .section-header p {
+    color: rgba(255,255,255,0.8);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(10px);
+    transition: var(--transition);
+}
+
+.feature:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.15);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature h3 {
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.feature p {
+    color: rgba(255,255,255,0.9);
+    line-height: 1.6;
+}
+
+/* Final CTA */
+.final-cta {
+    padding: 6rem 0;
+    background: var(--secondary-color);
+    text-align: center;
+}
+
+.cta-content h2 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.cta-content p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.cta-guarantee {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.guarantee-badge {
+    background: var(--background-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .hero-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .hero-stats {
+        gap: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .dogs-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .breeds-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .process-steps {
+        grid-template-columns: 1fr;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-guarantee {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 4rem 0;
+    }
+    
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .featured-dogs,
+    .all-breeds-section,
+    .process-section,
+    .features-section,
+    .final-cta {
+        padding: 3rem 0;
+    }
+    
+    .dog-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add loading animation to breed cards
+    const breedCards = document.querySelectorAll('.breed-card');
+    breedCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+    });
+
+    // Intersection Observer for animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-in');
+            }
+        });
+    }, observerOptions);
+
+    // Observe all sections for animation
+    document.querySelectorAll('.breed-category, .process-step, .feature').forEach(el => {
+        observer.observe(el);
+    });
+});
+
+// Add CSS for animations
+const style = document.createElement('style');
+style.textContent = `
+    .fade-in {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+    }
+    
+    .fade-in.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .breed-card {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+    }
+    
+    .breed-card.animate-in {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

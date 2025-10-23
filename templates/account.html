@@ -1,0 +1,809 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <!-- Account Header -->
+        <div style="text-align: center; margin: 2rem 0 3rem 0;">
+            <h1>My Account</h1>
+            <p style="color: #666;">Welcome back, {{ current_user.first_name }}!</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 3rem;">
+            <!-- Sidebar Navigation -->
+            <div class="form-container" style="padding: 0; overflow: hidden;">
+                <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-color); text-align: center;">
+                    <div class="profile-picture-large">
+                        {% if current_user.profile_picture %}
+                            <img src="{{ current_user.profile_picture }}" alt="Profile Picture" id="profile-preview">
+                        {% else %}
+                            <div class="profile-placeholder" id="profile-preview">
+                                {{ current_user.first_name[0] }}{{ current_user.last_name[0] }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h3 style="margin: 1rem 0 0 0; color: var(--primary-color);">{{ current_user.first_name }} {{ current_user.last_name }}</h3>
+                    <p style="color: #666; margin: 0.5rem 0 0 0; font-size: 0.9rem;">{{ current_user.email }}</p>
+                </div>
+                <nav style="padding: 0;">
+                    <a href="#profile" class="account-nav-item active" data-tab="profile">
+                        👤 Profile Information
+                    </a>
+                    <a href="#orders" class="account-nav-item" data-tab="orders">
+                        📦 My Orders ({{ total_orders }})
+                    </a>
+                    <a href="#wishlist" class="account-nav-item" data-tab="wishlist">
+                        ❤️ My Wishlist ({{ wishlist_count }})
+                    </a>
+                    <a href="#settings" class="account-nav-item" data-tab="settings">
+                        ⚙️ Account Settings
+                    </a>
+                </nav>
+                <div style="padding: 1.5rem; border-top: 1px solid var(--border-color); text-align: center;">
+                    <small style="color: #666;">Member since {{ current_user.created_at.strftime('%B %Y') }}</small>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div>
+                <!-- Profile Information Tab -->
+                <div id="profile" class="account-tab active">
+                    <div class="form-container">
+                        <h2>Profile Information</h2>
+                        
+                        <!-- User Statistics -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                            <div class="profile-stat">
+                                <div class="stat-number">{{ total_orders }}</div>
+                                <div class="stat-label">Total Orders</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="stat-number">{{ completed_orders }}</div>
+                                <div class="stat-label">Completed</div>
+                            </div>
+                            <div class="profile-stat">
+                                <div class="stat-number">KES {{ "{:,.0f}".format(total_spent) }}</div>
+                                <div class="stat-label">Total Spent</div>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <div>
+                                <h3>Personal Details</h3>
+                                <div class="info-group">
+                                    <label>Full Name</label>
+                                    <div class="info-value">{{ current_user.first_name }} {{ current_user.last_name }}</div>
+                                </div>
+                                <div class="info-group">
+                                    <label>Email Address</label>
+                                    <div class="info-value">{{ current_user.email }}</div>
+                                    {% if current_user.is_verified %}
+                                    <span style="color: var(--success-color); font-size: 0.9rem;">✓ Verified</span>
+                                    {% else %}
+                                    <span style="color: var(--error-color); font-size: 0.9rem;">⚠ Not verified</span>
+                                    {% endif %}
+                                </div>
+                                <div class="info-group">
+                                    <label>Phone Number</label>
+                                    <div class="info-value">{{ current_user.phone }}</div>
+                                </div>
+                                <div class="info-group">
+                                    <label>Member Since</label>
+                                    <div class="info-value">{{ current_user.created_at.strftime('%B %d, %Y') }}</div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3>Account Status</h3>
+                                <div class="status-card {{ 'verified' if current_user.is_verified else 'pending' }}">
+                                    <div class="status-icon">{{ '✓' if current_user.is_verified else '⏳' }}</div>
+                                    <div>
+                                        <div class="status-title">Email Verification</div>
+                                        <div class="status-desc">
+                                            {% if current_user.is_verified %}
+                                            Your email is verified and secure
+                                            {% else %}
+                                            <a href="{{ url_for('verify_email', email=current_user.email) }}" style="color: var(--primary-color);">Verify your email</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="status-card active">
+                                    <div class="status-icon">👤</div>
+                                    <div>
+                                        <div class="status-title">Account Active</div>
+                                        <div class="status-desc">Your account is in good standing</div>
+                                    </div>
+                                </div>
+                                <div class="status-card member">
+                                    <div class="status-icon">⭐</div>
+                                    <div>
+                                        <div class="status-title">Woofcare Member</div>
+                                        <div class="status-desc">Loyal customer since {{ current_user.created_at.strftime('%Y') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem; text-align: center;">
+                            <a href="#settings" class="account-nav-item btn" data-tab="settings" style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                                ✏️ Edit Profile & Photo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Orders Tab -->
+                <div id="orders" class="account-tab">
+                    <div class="form-container">
+                        <h2>My Orders ({{ orders|length }})</h2>
+                        {% if orders %}
+                        <div class="orders-list">
+                            {% for order in orders %}
+                            <div class="order-card">
+                                <div class="order-header">
+                                    <div>
+                                        <strong>Order #{{ order.id[:8] }}...</strong>
+                                        <span class="order-date">{{ order.created_at.strftime('%B %d, %Y at %H:%M') }}</span>
+                                    </div>
+                                    <span class="order-status {{ order.status }}">{{ order.status|title }}</span>
+                                </div>
+                                <div class="order-body">
+                                    <div class="order-dog">
+                                        {% if order.dog.image_url %}
+                                        <img src="{{ order.dog.image_url }}" alt="{{ order.dog.name }}" class="order-dog-image">
+                                        {% else %}
+                                        <div class="order-dog-image placeholder">🐕</div>
+                                        {% endif %}
+                                        <div class="order-dog-info">
+                                            <h4>{{ order.dog.name }}</h4>
+                                            <p>{{ order.dog.breed }} • {{ order.dog.age }} year{{ 's' if order.dog.age != 1 }} old • {{ order.dog.size|title }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="order-amount">
+                                        KES {{ "{:,.0f}".format(order.amount) }}
+                                    </div>
+                                </div>
+                                <div class="order-footer">
+                                    <div class="order-payment">
+                                        <strong>M-Pesa:</strong> {{ order.mpesa_number }}
+                                        {% if order.transaction_id %}
+                                        <br><small>Transaction: {{ order.transaction_id[:15] }}...</small>
+                                        {% endif %}
+                                    </div>
+                                    <div class="order-actions">
+                                        {% if order.status == 'completed' %}
+                                        <button class="btn btn-small" onclick="downloadCertificate('{{ order.id }}')">📄 Certificate</button>
+                                        {% endif %}
+                                        <button class="btn btn-small" onclick="viewOrderDetails('{{ order.id }}')">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div style="text-align: center; padding: 3rem;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">📦</div>
+                            <h3>No Orders Yet</h3>
+                            <p style="color: #666; margin-bottom: 2rem;">You haven't placed any orders yet.</p>
+                            <a href="{{ url_for('dogs') }}" class="btn">Browse Dogs</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- My Wishlist Tab -->
+                <div id="wishlist" class="account-tab">
+                    <div class="form-container">
+                        <h2>My Wishlist</h2>
+                        {% if wishlist_dogs %}
+                        <div class="dogs-grid">
+                            {% for dog in wishlist_dogs %}
+                            <div class="dog-card">
+                                <div class="dog-image">
+                                    {% if dog.image_url %}
+                                    <img src="{{ dog.image_url }}" alt="{{ dog.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                    <span style="font-size: 4rem;">🐕</span>
+                                    {% endif %}
+                                    <button class="wishlist-btn active" data-dog-id="{{ dog.id }}" title="Remove from wishlist">❤️</button>
+                                </div>
+                                <div class="dog-info">
+                                    <h3>{{ dog.name }}</h3>
+                                    <p><strong>Breed:</strong> {{ dog.breed }}</p>
+                                    <p><strong>Age:</strong> {{ dog.age }} year{{ 's' if dog.age != 1 }}</p>
+                                    <p><strong>Size:</strong> {{ dog.size|title }}</p>
+                                    <div class="price">KES {{ "{:,.0f}".format(dog.price) }}</div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                        <a href="{{ url_for('dog_detail', dog_id=dog.id) }}" class="btn" style="text-align: center; font-size: 0.9rem;">
+                                            View Details
+                                        </a>
+                                        {% if dog.is_available %}
+                                        <a href="{{ url_for('checkout', dog_id=dog.id) }}" class="btn" style="text-align: center; font-size: 0.9rem;">
+                                            Adopt Now
+                                        </a>
+                                        {% else %}
+                                        <button class="btn" disabled style="font-size: 0.9rem;">Sold Out</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div style="text-align: center; padding: 3rem;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">❤️</div>
+                            <h3>Your Wishlist is Empty</h3>
+                            <p style="color: #666; margin-bottom: 2rem;">Start adding dogs you love to your wishlist!</p>
+                            <a href="{{ url_for('dogs') }}" class="btn">Browse Dogs</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Account Settings Tab -->
+                <div id="settings" class="account-tab">
+                    <div class="form-container">
+                        <h2>Account Settings</h2>
+                        
+                        <!-- Profile Picture Upload -->
+                        <div style="margin-bottom: 2rem;">
+                            <h3>Profile Picture</h3>
+                            <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 1rem;">
+                                <div class="profile-picture-preview">
+                                    {% if current_user.profile_picture %}
+                                        <img src="{{ current_user.profile_picture }}" alt="Current Profile Picture" id="current-profile-pic">
+                                    {% else %}
+                                        <div class="profile-placeholder" id="current-profile-pic">
+                                            {{ current_user.first_name[0] }}{{ current_user.last_name[0] }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <p style="margin: 0 0 1rem 0; color: #666;">Upload a new profile picture (JPG, PNG, GIF - max 2MB)</p>
+                                    <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
+                                    <button type="button" class="btn" onclick="document.getElementById('profile-picture-input').click()">
+                                        Choose New Photo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Edit Profile Form -->
+                        <form method="POST" action="{{ url_for('update_profile') }}" enctype="multipart/form-data" style="margin-bottom: 2rem;">
+                            <h3>Edit Profile Information</h3>
+                            <input type="file" id="profile_picture" name="profile_picture" accept="image/*" style="display: none;">
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label for="first_name">First Name</label>
+                                    <input type="text" id="first_name" name="first_name" value="{{ current_user.first_name }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name">Last Name</label>
+                                    <input type="text" id="last_name" name="last_name" value="{{ current_user.last_name }}" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" value="{{ current_user.phone }}" required pattern="254[17]\d{8}">
+                                <small style="color: #666;">M-Pesa registered number for payments</small>
+                            </div>
+                            <button type="submit" class="btn">Update Profile</button>
+                        </form>
+
+                        <!-- Change Password Form -->
+                        <form method="POST" action="{{ url_for('change_password') }}">
+                            <h3>Change Password</h3>
+                            <div class="form-group">
+                                <label for="current_password">Current Password</label>
+                                <input type="password" id="current_password" name="current_password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new_password">New Password</label>
+                                <input type="password" id="new_password" name="new_password" required minlength="6">
+                                <small style="color: #666;">Must be at least 6 characters long</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm_password">Confirm New Password</label>
+                                <input type="password" id="confirm_password" name="confirm_password" required>
+                            </div>
+                            <button type="submit" class="btn">Change Password</button>
+                        </form>
+
+                        <!-- Account Actions -->
+                        <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+                            <h3>Account Actions</h3>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                {% if not current_user.is_verified %}
+                                <a href="{{ url_for('verify_email', email=current_user.email) }}" class="btn" style="background: #ffc107; color: #000;">
+                                    Verify Email Address
+                                </a>
+                                {% endif %}
+                                <button class="btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color);" onclick="downloadData()">
+                                    Download My Data
+                                </button>
+                                <button class="btn" style="background: var(--error-color);" onclick="confirmDelete()">
+                                    Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.account-nav-item {
+    display: block;
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.account-nav-item:hover,
+.account-nav-item.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.account-tab {
+    display: none;
+}
+
+.account-tab.active {
+    display: block;
+}
+
+.profile-picture-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 3px solid var(--primary-color);
+}
+
+.profile-picture-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-picture-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--primary-color);
+}
+
+.profile-picture-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.profile-stat {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--secondary-color);
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.profile-stat:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+}
+
+.info-group {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border-radius: 8px;
+}
+
+.info-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.status-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.status-card:hover {
+    transform: translateX(5px);
+}
+
+.status-card.verified {
+    border-left: 4px solid var(--success-color);
+}
+
+.status-card.pending {
+    border-left: 4px solid #ffc107;
+}
+
+.status-card.active {
+    border-left: 4px solid var(--primary-color);
+}
+
+.status-card.member {
+    border-left: 4px solid #6f42c1;
+}
+
+.status-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.status-title {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+}
+
+.status-desc {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Orders Styling */
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.order-card {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--secondary-color);
+}
+
+.order-date {
+    color: #666;
+    font-size: 0.9rem;
+    margin-left: 1rem;
+}
+
+.order-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.order-status.pending {
+    background: #ffc107;
+    color: #000;
+}
+
+.order-status.completed {
+    background: var(--success-color);
+    color: white;
+}
+
+.order-status.failed {
+    background: var(--error-color);
+    color: white;
+}
+
+.order-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
+
+.order-dog {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.order-dog-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.order-dog-image.placeholder {
+    background: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.order-amount {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.order-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border-top: 1px solid var(--border-color);
+}
+
+.order-payment {
+    font-size: 0.9rem;
+}
+
+.order-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+}
+
+/* Wishlist Styling */
+.wishlist-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.wishlist-btn.active {
+    background: rgba(255,255,255,0.9);
+}
+
+.wishlist-btn:hover {
+    transform: scale(1.1);
+}
+
+.dog-image {
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .container > div {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .order-body,
+    .order-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .order-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .form-container form > div {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .profile-stat {
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+<script>
+// Tab switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const navItems = document.querySelectorAll('.account-nav-item');
+    const tabs = document.querySelectorAll('.account-tab');
+    
+    navItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all items and tabs
+            navItems.forEach(nav => nav.classList.remove('active'));
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Show corresponding tab
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+    
+    // Profile picture preview
+    const profilePictureInput = document.getElementById('profile-picture-input');
+    const currentProfilePic = document.getElementById('current-profile-pic');
+    const profilePreview = document.getElementById('profile-preview');
+    const formProfileInput = document.getElementById('profile_picture');
+    
+    if (profilePictureInput) {
+        profilePictureInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Update preview in settings
+                    if (currentProfilePic.tagName === 'IMG') {
+                        currentProfilePic.src = e.target.result;
+                    } else {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Profile Preview';
+                        currentProfilePic.parentNode.replaceChild(img, currentProfilePic);
+                        img.id = 'current-profile-pic';
+                    }
+                    
+                    // Update preview in sidebar
+                    if (profilePreview.tagName === 'IMG') {
+                        profilePreview.src = e.target.result;
+                    } else {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Profile Preview';
+                        profilePreview.parentNode.replaceChild(img, profilePreview);
+                        img.id = 'profile-preview';
+                    }
+                    
+                    // Also update the form input
+                    formProfileInput.files = e.target.files;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Wishlist functionality
+    const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+    wishlistBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const dogId = this.getAttribute('data-dog-id');
+            toggleWishlist(dogId, this);
+        });
+    });
+});
+
+function toggleWishlist(dogId, button) {
+    fetch('/api/wishlist/toggle', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ dog_id: dogId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.action === 'removed') {
+                button.closest('.dog-card').remove();
+                updateWishlistCount();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function updateWishlistCount() {
+    location.reload();
+}
+
+function downloadCertificate(orderId) {
+    alert('Certificate download would be implemented for order: ' + orderId);
+}
+
+function viewOrderDetails(orderId) {
+    alert('Order details would be shown for: ' + orderId);
+}
+
+function downloadData() {
+    alert('Data download feature would be implemented here.');
+}
+
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently lost.')) {
+        alert('Account deletion feature would be implemented here.');
+    }
+}
+
+// Password confirmation validation
+document.addEventListener('DOMContentLoaded', function() {
+    const newPassword = document.getElementById('new_password');
+    const confirmPassword = document.getElementById('confirm_password');
+    
+    if (confirmPassword) {
+        confirmPassword.addEventListener('input', function() {
+            if (newPassword.value !== confirmPassword.value) {
+                confirmPassword.style.borderColor = 'var(--error-color)';
+            } else {
+                confirmPassword.style.borderColor = '';
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

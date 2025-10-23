@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="filters">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 1.5rem;">Find Your Perfect Companion</h2>
+        <form method="GET" action="{{ url_for('dogs') }}" class="filter-form">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="breed">Breed</label>
+                    <select id="breed" name="breed">
+                        <option value="">All Breeds</option>
+                        {% for breed in breeds %}
+                        <option value="{{ breed }}" {{ 'selected' if request.args.get('breed') == breed }}>
+                            {{ breed }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age_category">Age Category</label>
+                    <select id="age_category" name="age_category">
+                        <option value="">Any Age</option>
+                        <option value="puppy" {{ 'selected' if request.args.get('age_category') == 'puppy' }}>Puppy (0-1 year)</option>
+                        <option value="young" {{ 'selected' if request.args.get('age_category') == 'young' }}>Young (1-3 years)</option>
+                        <option value="adult" {{ 'selected' if request.args.get('age_category') == 'adult' }}>Adult (3-7 years)</option>
+                        <option value="senior" {{ 'selected' if request.args.get('age_category') == 'senior' }}>Senior (7+ years)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="size">Size</label>
+                    <select id="size" name="size">
+                        <option value="">Any Size</option>
+                        <option value="small" {{ 'selected' if request.args.get('size') == 'small' }}>Small</option>
+                        <option value="medium" {{ 'selected' if request.args.get('size') == 'medium' }}>Medium</option>
+                        <option value="large" {{ 'selected' if request.args.get('size') == 'large' }}>Large</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" name="color" 
+                           value="{{ request.args.get('color', '') }}"
+                           placeholder="e.g., Golden, Black">
+                </div>
+                
+                <div class="form-group">
+                    <label for="energy_level">Energy Level</label>
+                    <select id="energy_level" name="energy_level">
+                        <option value="">Any Energy Level</option>
+                        <option value="low" {{ 'selected' if request.args.get('energy_level') == 'low' }}>Low</option>
+                        <option value="medium" {{ 'selected' if request.args.get('energy_level') == 'medium' }}>Medium</option>
+                        <option value="high" {{ 'selected' if request.args.get('energy_level') == 'high' }}>High</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 1rem;">
+                <button type="submit" class="btn">Apply Filters</button>
+                <a href="{{ url_for('dogs') }}" class="btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); margin-left: 0.5rem;">
+                    Clear Filters
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 2rem 0;">
+        <h2>Available Dogs ({{ dogs|length }})</h2>
+        <div style="color: #666;">
+            {% if request.args.get('breed') or request.args.get('age_category') or request.args.get('size') or request.args.get('color') or request.args.get('energy_level') %}
+            Filters applied
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if dogs %}
+    <div class="dogs-grid">
+        {% for dog in dogs %}
+        <div class="dog-card">
+            <div class="dog-image">
+                {% if dog.image_url %}
+                <img src="{{ dog.image_url }}" alt="{{ dog.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <span style="font-size: 4rem;">🐕</span>
+                {% endif %}
+            </div>
+            <div class="dog-info">
+                <h3>{{ dog.name }}</h3>
+                <p><strong>Breed:</strong> {{ dog.breed }}</p>
+                <p><strong>Age:</strong> {{ dog.age }} year{{ 's' if dog.age != 1 }}</p>
+                <p><strong>Size:</strong> <span style="text-transform: capitalize;">{{ dog.size }}</span></p>
+                <p><strong>Color:</strong> {{ dog.color }}</p>
+                <p><strong>Energy:</strong> <span style="text-transform: capitalize;">{{ dog.energy_level }}</span></p>
+                <div class="price">KES {{ "{:,.0f}".format(dog.price) }}</div>
+                <a href="{{ url_for('dog_detail', dog_id=dog.id) }}" class="btn" style="display: block; text-align: center;">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align: center; padding: 3rem; background: var(--secondary-color); border-radius: 10px;">
+        <h3>No dogs found matching your criteria</h3>
+        <p>Try adjusting your filters or <a href="{{ url_for('dogs') }}">browse all dogs</a></p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

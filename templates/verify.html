@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <h2>Verify Your Email</h2>
+        <p style="text-align: center; margin-bottom: 1.5rem;">
+            We've sent a 6-digit verification code to <strong>{{ email }}</strong>
+        </p>
+        
+        <form method="POST">
+            <input type="hidden" name="email" value="{{ email }}">
+            
+            <div class="form-group">
+                <label for="code">Verification Code</label>
+                <input type="text" id="code" name="code" required 
+                       maxlength="6" pattern="[0-9]{6}"
+                       placeholder="Enter 6-digit code">
+                <small style="color: #666;">Check your email for the verification code</small>
+            </div>
+            
+            <button type="submit" class="btn" style="width: 100%;">Verify Email</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <p>Didn't receive the code?</p>
+            <form method="POST" action="{{ url_for('resend_verification') }}" style="display: inline;">
+                <input type="hidden" name="email" value="{{ email }}">
+                <button type="submit" class="btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color);">
+                    Resend Code
+                </button>
+            </form>
+        </div>
+        
+        <div style="text-align: center; margin-top: 1rem;">
+            <a href="{{ url_for('register') }}" style="color: var(--primary-color);">Use different email</a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const codeInput = document.getElementById('code');
+    
+    // Auto-format verification code
+    if (codeInput) {
+        codeInput.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 6);
+        });
+        
+        codeInput.focus();
+    }
+});
+</script>
+{% endblock %}

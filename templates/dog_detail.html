@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div style="max-width: 1000px; margin: 0 auto;">
+        <!-- Breadcrumb -->
+        <nav style="margin: 1rem 0;">
+            <a href="{{ url_for('index') }}">Home</a> &gt;
+            <a href="{{ url_for('dogs') }}">Dogs</a> &gt;
+            <span>{{ dog.name }}</span>
+        </nav>
+        
+        <div class="dog-detail" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin: 2rem 0;">
+            <!-- Dog Images -->
+            <div>
+                <div class="dog-image" style="border-radius: 10px; overflow: hidden; margin-bottom: 1rem;">
+                    {% if dog.image_url %}
+                    <img src="{{ dog.image_url }}" alt="{{ dog.name }}" style="width: 100%; height: 400px; object-fit: cover;">
+                    {% else %}
+                    <div style="width: 100%; height: 400px; background: var(--secondary-color); display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 6rem;">🐕</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Dog Information -->
+            <div>
+                <h1 style="color: var(--primary-color); margin-bottom: 0.5rem;">{{ dog.name }}</h1>
+                <p style="font-size: 1.2rem; color: #666; margin-bottom: 1.5rem;">{{ dog.breed }}</p>
+                
+                <div class="price" style="font-size: 2rem; margin-bottom: 2rem;">
+                    KES {{ "{:,.0f}".format(dog.price) }}
+                </div>
+                
+                <!-- Dog Details Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                    <div class="detail-item">
+                        <strong>Age:</strong> {{ dog.age }} year{{ 's' if dog.age != 1 }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Age Category:</strong> <span style="text-transform: capitalize;">{{ dog.age_category }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Size:</strong> <span style="text-transform: capitalize;">{{ dog.size }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Color:</strong> {{ dog.color }}
+                    </div>
+                    <div class="detail-item">
+                        <strong>Energy Level:</strong> <span style="text-transform: capitalize;">{{ dog.energy_level }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>Status:</strong> 
+                        <span style="color: var(--success-color); font-weight: bold;">Available</span>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div style="margin-bottom: 2rem;">
+                    <h3>About {{ dog.name }}</h3>
+                    <p style="line-height: 1.6;">{{ dog.description }}</p>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div>
+                    {% if current_user.is_authenticated %}
+                        {% if dog.is_available %}
+                            <a href="{{ url_for('checkout', dog_id=dog.id) }}" class="btn" style="font-size: 1.1rem; padding: 15px 30px;">
+                                Adopt {{ dog.name }} - KES {{ "{:,.0f}".format(dog.price) }}
+                            </a>
+                        {% else %}
+                            <button class="btn" disabled style="background: #ccc; font-size: 1.1rem; padding: 15px 30px;">
+                                Currently Unavailable
+                            </button>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('login', next=url_for('checkout', dog_id=dog.id)) }}" class="btn" style="font-size: 1.1rem; padding: 15px 30px;">
+                            Login to Adopt
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- M-Pesa Note -->
+                <div class="mpesa-note" style="margin-top: 1.5rem;">
+                    <p>💡 <strong>M-Pesa Payment:</strong> Secure payment via M-Pesa. You'll receive a prompt on your phone to complete the transaction.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Similar Dogs Section -->
+        <div style="margin: 4rem 0;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Similar Dogs</h2>
+            <div class="dogs-grid">
+                {% for similar_dog in similar_dogs %}
+                {% if similar_dog.id != dog.id and similar_dog.is_available %}
+                <div class="dog-card">
+                    <div class="dog-image">
+                        {% if similar_dog.image_url %}
+                        <img src="{{ similar_dog.image_url }}" alt="{{ similar_dog.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                        <span style="font-size: 4rem;">🐕</span>
+                        {% endif %}
+                    </div>
+                    <div class="dog-info">
+                        <h3>{{ similar_dog.name }}</h3>
+                        <p><strong>Breed:</strong> {{ similar_dog.breed }}</p>
+                        <p><strong>Age:</strong> {{ similar_dog.age }} year{{ 's' if similar_dog.age != 1 }}</p>
+                        <div class="price">KES {{ "{:,.0f}".format(similar_dog.price) }}</div>
+                        <a href="{{ url_for('dog_detail', dog_id=similar_dog.id) }}" class="btn" style="display: block; text-align: center;">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.detail-item {
+    padding: 0.8rem;
+    background: var(--secondary-color);
+    border-radius: 5px;
+}
+
+@media (max-width: 768px) {
+    .dog-detail {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+    }
+}
+</style>
+{% endblock %}

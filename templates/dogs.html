@@ -1,0 +1,1851 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Find Your Perfect Canine Companion</h1>
+        <p>Browse through our collection of 30+ premium dog breeds, each waiting for their forever home</p>
+    </div>
+
+    <!-- Search and Advanced Filters -->
+    <section class="filters-section">
+        <div class="filters-container">
+            <!-- Quick Search Bar -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="globalSearch" placeholder="Search by breed, name, color, or description...">
+                    <button class="search-btn" id="searchButton">
+                        <span class="search-icon">🔍</span>
+                        Search
+                    </button>
+                </div>
+                <div class="search-tips">
+                    <small>Try: "Labrador", "small dogs", "family friendly", "apartment dogs"</small>
+                </div>
+            </div>
+
+            <!-- Advanced Filters Toggle -->
+            <div class="filters-toggle">
+                <button class="btn btn-outline" id="toggleFilters">
+                    <span class="toggle-icon">⚙️</span>
+                    Advanced Filters
+                    <span class="toggle-arrow">▼</span>
+                </button>
+            </div>
+
+            <!-- Advanced Filters Panel -->
+            <div class="advanced-filters" id="advancedFilters">
+                <div class="filters-grid">
+                    <!-- Breed Filter -->
+                    <div class="filter-group">
+                        <label for="breed">Breed</label>
+                        <select id="breed" name="breed" class="filter-select">
+                            <option value="">All Breeds (30+)</option>
+                            <optgroup label="Family-Friendly Breeds">
+                                <option value="Labrador Retriever" {{ 'selected' if request.args.get('breed') == 'Labrador Retriever' }}>Labrador Retriever</option>
+                                <option value="Golden Retriever" {{ 'selected' if request.args.get('breed') == 'Golden Retriever' }}>Golden Retriever</option>
+                                <option value="Beagle" {{ 'selected' if request.args.get('breed') == 'Beagle' }}>Beagle</option>
+                                <option value="Bulldog" {{ 'selected' if request.args.get('breed') == 'Bulldog' }}>Bulldog</option>
+                                <option value="Poodle" {{ 'selected' if request.args.get('breed') == 'Poodle' }}>Poodle</option>
+                            </optgroup>
+                            <optgroup label="Working & Guardian Breeds">
+                                <option value="German Shepherd" {{ 'selected' if request.args.get('breed') == 'German Shepherd' }}>German Shepherd</option>
+                                <option value="Rottweiler" {{ 'selected' if request.args.get('breed') == 'Rottweiler' }}>Rottweiler</option>
+                                <option value="Doberman Pinscher" {{ 'selected' if request.args.get('breed') == 'Doberman Pinscher' }}>Doberman Pinscher</option>
+                                <option value="Boxer" {{ 'selected' if request.args.get('breed') == 'Boxer' }}>Boxer</option>
+                                <option value="Great Dane" {{ 'selected' if request.args.get('breed') == 'Great Dane' }}>Great Dane</option>
+                            </optgroup>
+                            <optgroup label="Small & Companion Breeds">
+                                <option value="Yorkshire Terrier" {{ 'selected' if request.args.get('breed') == 'Yorkshire Terrier' }}>Yorkshire Terrier</option>
+                                <option value="Chihuahua" {{ 'selected' if request.args.get('breed') == 'Chihuahua' }}>Chihuahua</option>
+                                <option value="Shih Tzu" {{ 'selected' if request.args.get('breed') == 'Shih Tzu' }}>Shih Tzu</option>
+                                <option value="Maltese" {{ 'selected' if request.args.get('breed') == 'Maltese' }}>Maltese</option>
+                                <option value="French Bulldog" {{ 'selected' if request.args.get('breed') == 'French Bulldog' }}>French Bulldog</option>
+                            </optgroup>
+                            <optgroup label="Active & Herding Breeds">
+                                <option value="Border Collie" {{ 'selected' if request.args.get('breed') == 'Border Collie' }}>Border Collie</option>
+                                <option value="Australian Shepherd" {{ 'selected' if request.args.get('breed') == 'Australian Shepherd' }}>Australian Shepherd</option>
+                                <option value="Siberian Husky" {{ 'selected' if request.args.get('breed') == 'Siberian Husky' }}>Siberian Husky</option>
+                                <option value="Shetland Sheepdog" {{ 'selected' if request.args.get('breed') == 'Shetland Sheepdog' }}>Shetland Sheepdog</option>
+                                <option value="Irish Setter" {{ 'selected' if request.args.get('breed') == 'Irish Setter' }}>Irish Setter</option>
+                            </optgroup>
+                            <optgroup label="Unique & Special Breeds">
+                                <option value="Dachshund" {{ 'selected' if request.args.get('breed') == 'Dachshund' }}>Dachshund</option>
+                                <option value="Cocker Spaniel" {{ 'selected' if request.args.get('breed') == 'Cocker Spaniel' }}>Cocker Spaniel</option>
+                                <option value="Saint Bernard" {{ 'selected' if request.args.get('breed') == 'Saint Bernard' }}>Saint Bernard</option>
+                                <option value="Bernese Mountain Dog" {{ 'selected' if request.args.get('breed') == 'Bernese Mountain Dog' }}>Bernese Mountain Dog</option>
+                                <option value="Greyhound" {{ 'selected' if request.args.get('breed') == 'Greyhound' }}>Greyhound</option>
+                            </optgroup>
+                            <optgroup label="More Wonderful Breeds">
+                                <option value="Bichon Frisé" {{ 'selected' if request.args.get('breed') == 'Bichon Frisé' }}>Bichon Frisé</option>
+                                <option value="Akita" {{ 'selected' if request.args.get('breed') == 'Akita' }}>Akita</option>
+                                <option value="Pit Bull Terrier" {{ 'selected' if request.args.get('breed') == 'Pit Bull Terrier' }}>Pit Bull Terrier</option>
+                                <option value="Dalmatian" {{ 'selected' if request.args.get('breed') == 'Dalmatian' }}>Dalmatian</option>
+                                <option value="Pug" {{ 'selected' if request.args.get('breed') == 'Pug' }}>Pug</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Age Category -->
+                    <div class="filter-group">
+                        <label for="age_category">Age Category</label>
+                        <select id="age_category" name="age_category" class="filter-select">
+                            <option value="">Any Age</option>
+                            <option value="puppy" {{ 'selected' if request.args.get('age_category') == 'puppy' }}>🐕 Puppy (0-1 year)</option>
+                            <option value="young" {{ 'selected' if request.args.get('age_category') == 'young' }}>🐶 Young (1-3 years)</option>
+                            <option value="adult" {{ 'selected' if request.args.get('age_category') == 'adult' }}>🐾 Adult (3-7 years)</option>
+                            <option value="senior" {{ 'selected' if request.args.get('age_category') == 'senior' }}>👴 Senior (7+ years)</option>
+                        </select>
+                    </div>
+
+                    <!-- Size Filter -->
+                    <div class="filter-group">
+                        <label for="size">Size</label>
+                        <select id="size" name="size" class="filter-select">
+                            <option value="">Any Size</option>
+                            <option value="small" {{ 'selected' if request.args.get('size') == 'small' }}>🐭 Small (under 20 lbs)</option>
+                            <option value="medium" {{ 'selected' if request.args.get('size') == 'medium' }}>🐕 Medium (20-50 lbs)</option>
+                            <option value="large" {{ 'selected' if request.args.get('size') == 'large' }}>🦮 Large (50+ lbs)</option>
+                        </select>
+                    </div>
+
+                    <!-- Energy Level -->
+                    <div class="filter-group">
+                        <label for="energy_level">Energy Level</label>
+                        <select id="energy_level" name="energy_level" class="filter-select">
+                            <option value="">Any Energy Level</option>
+                            <option value="low" {{ 'selected' if request.args.get('energy_level') == 'low' }}>😴 Low - Relaxed & Calm</option>
+                            <option value="medium" {{ 'selected' if request.args.get('energy_level') == 'medium' }}>😊 Medium - Balanced</option>
+                            <option value="high" {{ 'selected' if request.args.get('energy_level') == 'high' }}>⚡ High - Very Active</option>
+                        </select>
+                    </div>
+
+                    <!-- Price Range -->
+                    <div class="filter-group">
+                        <label for="price_range">Price Range (KES)</label>
+                        <select id="price_range" name="price_range" class="filter-select">
+                            <option value="">Any Price</option>
+                            <option value="0-20000" {{ 'selected' if request.args.get('price_range') == '0-20000' }}>Under 20,000</option>
+                            <option value="20000-40000" {{ 'selected' if request.args.get('price_range') == '20000-40000' }}>20,000 - 40,000</option>
+                            <option value="40000-60000" {{ 'selected' if request.args.get('price_range') == '40000-60000' }}>40,000 - 60,000</option>
+                            <option value="60000-80000" {{ 'selected' if request.args.get('price_range') == '60000-80000' }}>60,000 - 80,000</option>
+                            <option value="80000-100000" {{ 'selected' if request.args.get('price_range') == '80000-100000' }}>80,000 - 100,000</option>
+                            <option value="100000+" {{ 'selected' if request.args.get('price_range') == '100000+' }}>Over 100,000</option>
+                        </select>
+                    </div>
+
+                    <!-- Color Filter -->
+                    <div class="filter-group">
+                        <label for="color">Color</label>
+                        <input type="text" id="color" name="color" 
+                               value="{{ request.args.get('color', '') }}"
+                               placeholder="Golden, Black, White, Brown..."
+                               class="filter-input">
+                    </div>
+                </div>
+
+                <!-- Filter Actions -->
+                <div class="filter-actions">
+                    <button type="button" id="applyFilters" class="btn btn-primary">
+                        <span class="action-icon">✅</span>
+                        Apply Filters
+                    </button>
+                    <button type="button" id="clearFilters" class="btn btn-secondary">
+                        <span class="action-icon">🔄</span>
+                        Clear All
+                    </button>
+                    <button type="button" id="saveSearch" class="btn btn-outline">
+                        <span class="action-icon">💾</span>
+                        Save Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Header -->
+    <section class="results-header">
+        <div class="results-info">
+            <h2>
+                Available Dogs 
+                <span class="results-count" id="resultsCount">({{ dogs|length }} found)</span>
+            </h2>
+            
+            <div class="view-controls">
+                <div class="sort-options">
+                    <label for="sortBy">Sort by:</label>
+                    <select id="sortBy" class="sort-select">
+                        <option value="newest">Newest First</option>
+                        <option value="price_low">Price: Low to High</option>
+                        <option value="price_high">Price: High to Low</option>
+                        <option value="name">Name: A to Z</option>
+                        <option value="age">Age: Youngest First</option>
+                        <option value="popular">Most Popular</option>
+                    </select>
+                </div>
+                
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid" title="Grid View">
+                        ▦ Grid
+                    </button>
+                    <button class="view-btn" data-view="list" title="List View">
+                        ☰ List
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Filters Display -->
+        <div class="active-filters" id="activeFilters">
+            {% if request.args.get('breed') or request.args.get('age_category') or request.args.get('size') or request.args.get('color') or request.args.get('energy_level') or request.args.get('price_range') %}
+            <div class="active-filters-header">
+                <strong>Active Filters:</strong>
+                <button class="clear-all-filters" id="clearAllFilters">Clear All</button>
+            </div>
+            <div class="active-filters-list">
+                {% if request.args.get('breed') %}
+                <span class="filter-tag">
+                    Breed: {{ request.args.get('breed') }}
+                    <button class="remove-filter" data-filter="breed">×</button>
+                </span>
+                {% endif %}
+                {% if request.args.get('age_category') %}
+                <span class="filter-tag">
+                    Age: {{ request.args.get('age_category') }}
+                    <button class="remove-filter" data-filter="age_category">×</button>
+                </span>
+                {% endif %}
+                {% if request.args.get('size') %}
+                <span class="filter-tag">
+                    Size: {{ request.args.get('size') }}
+                    <button class="remove-filter" data-filter="size">×</button>
+                </span>
+                {% endif %}
+                {% if request.args.get('energy_level') %}
+                <span class="filter-tag">
+                    Energy: {{ request.args.get('energy_level') }}
+                    <button class="remove-filter" data-filter="energy_level">×</button>
+                </span>
+                {% endif %}
+                {% if request.args.get('price_range') %}
+                <span class="filter-tag">
+                    Price: {{ request.args.get('price_range') }}
+                    <button class="remove-filter" data-filter="price_range">×</button>
+                </span>
+                {% endif %}
+                {% if request.args.get('color') %}
+                <span class="filter-tag">
+                    Color: {{ request.args.get('color') }}
+                    <button class="remove-filter" data-filter="color">×</button>
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Dogs Display Section -->
+    <section class="dogs-display-section">
+        {% if dogs %}
+        <div class="dogs-grid" id="dogsGrid">
+            {% for dog in dogs %}
+            <div class="dog-card" 
+                 data-dog-id="{{ dog.id }}" 
+                 data-price="{{ dog.price }}" 
+                 data-age="{{ dog.age }}" 
+                 data-name="{{ dog.name|lower }}"
+                 data-breed="{{ dog.breed|lower }}"
+                 data-size="{{ dog.size }}"
+                 data-energy="{{ dog.energy_level }}"
+                 data-color="{{ dog.color|lower }}">
+                
+                <!-- Dog Image with Overlays -->
+                <div class="dog-image">
+                    {% if dog.image_url %}
+                    <img src="{{ dog.image_url }}" alt="{{ dog.name }} - {{ dog.breed }}" loading="lazy">
+                    {% else %}
+                    <div class="image-placeholder">
+                        <span class="placeholder-icon">🐕</span>
+                        <span class="placeholder-text">{{ dog.breed }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Status Badge -->
+                    <div class="status-badge {{ 'available' if dog.is_available else 'reserved' }}">
+                        {{ 'Available' if dog.is_available else 'Reserved' }}
+                    </div>
+
+                    <!-- Quick Actions Overlay -->
+                    <div class="card-actions">
+                        <button class="wishlist-btn {{ 'in-wishlist' if dog.in_wishlist else '' }}" 
+                                data-dog-id="{{ dog.id }}" 
+                                title="{{ 'Remove from wishlist' if dog.in_wishlist else 'Add to wishlist' }}">
+                            {{ '❤️' if dog.in_wishlist else '♡' }}
+                        </button>
+                        <button class="quick-view-btn" data-dog-id="{{ dog.id }}" title="Quick view">
+                            👁️
+                        </button>
+                        <button class="compare-btn" data-dog-id="{{ dog.id }}" title="Add to compare">
+                            ⚖️
+                        </button>
+                    </div>
+
+                    <!-- Breed Tag -->
+                    <div class="breed-tag">
+                        {{ dog.breed }}
+                    </div>
+                </div>
+
+                <!-- Dog Information -->
+                <div class="dog-info">
+                    <!-- Header Section -->
+                    <div class="dog-header">
+                        <h3 class="dog-name">{{ dog.name }}</h3>
+                        <div class="dog-meta">
+                            <span class="dog-breed">{{ dog.breed }}</span>
+                            <span class="dog-age">{{ dog.age }} year{{ 's' if dog.age != 1 }} old</span>
+                        </div>
+                    </div>
+
+                    <!-- Key Details Grid -->
+                    <div class="dog-details-grid">
+                        <div class="detail-item">
+                            <span class="detail-icon">📏</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Size</span>
+                                <span class="detail-value">{{ dog.size|title }}</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🎨</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Color</span>
+                                <span class="detail-value">{{ dog.color }}</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">⚡</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Energy</span>
+                                <span class="detail-value energy-{{ dog.energy_level }}">
+                                    {{ dog.energy_level|title }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🏷️</span>
+                            <div class="detail-content">
+                                <span class="detail-label">Category</span>
+                                <span class="detail-value">{{ dog.age_category|title }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="dog-description">
+                        <p>{{ dog.description }}</p>
+                    </div>
+
+                    <!-- Price and Actions -->
+                    <div class="dog-footer">
+                        <div class="price-section">
+                            <div class="price-amount">
+                                KES {{ "{:,.0f}".format(dog.price) }}
+                            </div>
+                            {% if dog.age_category == 'puppy' %}
+                            <div class="price-badge">Puppy Price</div>
+                            {% endif %}
+                            <div class="price-note">
+                                {% if dog.price < 25000 %}
+                                Great Value
+                                {% elif dog.price < 50000 %}
+                                Premium
+                                {% else %}
+                                Exclusive
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="{{ url_for('dog_detail', dog_id=dog.id) }}" class="btn btn-outline btn-small view-details-btn">
+                                <span class="btn-icon">🔍</span>
+                                View Details
+                            </a>
+                            {% if dog.is_available %}
+                                {% if current_user.is_authenticated %}
+                                <a href="{{ url_for('checkout', dog_id=dog.id) }}" class="btn btn-primary btn-small adopt-btn">
+                                    <span class="btn-icon">🏠</span>
+                                    Adopt Now
+                                </a>
+                                {% else %}
+                                <a href="{{ url_for('login', next=url_for('checkout', dog_id=dog.id)) }}" class="btn btn-primary btn-small adopt-btn">
+                                    <span class="btn-icon">🔐</span>
+                                    Login to Adopt
+                                </a>
+                                {% endif %}
+                            {% else %}
+                            <button class="btn btn-disabled btn-small" disabled>
+                                <span class="btn-icon">⏳</span>
+                                Currently Unavailable
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="additional-info">
+                        <div class="info-item">
+                            <span class="info-icon">🏥</span>
+                            <span>Health Guaranteed</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">📄</span>
+                            <span>Papers Included</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🚚</span>
+                            <span>Free Delivery</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- No Results Message -->
+        {% else %}
+        <div class="no-results">
+            <div class="no-results-content">
+                <div class="no-results-icon">🐕‍🦺</div>
+                <h3>No dogs found matching your criteria</h3>
+                <p>Try adjusting your filters or browse all available dogs. We add new dogs regularly!</p>
+                <div class="no-results-actions">
+                    <a href="{{ url_for('dogs') }}" class="btn btn-primary">
+                        Show All Dogs
+                    </a>
+                    <button class="btn btn-outline" id="resetSearchFilters">
+                        Reset Search Filters
+                    </button>
+                </div>
+                <div class="no-results-suggestions">
+                    <h4>Popular Searches:</h4>
+                    <div class="suggestion-tags">
+                        <a href="{{ url_for('dogs') }}?size=small" class="suggestion-tag">Small Dogs</a>
+                        <a href="{{ url_for('dogs') }}?age_category=puppy" class="suggestion-tag">Puppies</a>
+                        <a href="{{ url_for('dogs') }}?energy_level=low" class="suggestion-tag">Low Energy</a>
+                        <a href="{{ url_for('dogs') }}?breed=Labrador Retriever" class="suggestion-tag">Labradors</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+
+    <!-- Quick Comparison Section -->
+    <section class="comparison-section" id="comparisonSection" style="display: none;">
+        <div class="comparison-header">
+            <h3>Compare Dogs</h3>
+            <button class="btn btn-outline btn-small" id="clearComparison">Clear All</button>
+        </div>
+        <div class="comparison-grid" id="comparisonGrid">
+            <!-- Comparison items will be added here dynamically -->
+        </div>
+    </section>
+
+    <!-- Breed Information Section -->
+    <section class="breed-guide-section">
+        <div class="section-header">
+            <h2>Dog Breed Guide</h2>
+            <p>Learn about different breeds to find your perfect match</p>
+        </div>
+        
+        <div class="breed-categories">
+            <div class="breed-category-card">
+                <div class="category-icon">🐕</div>
+                <h3>Family-Friendly Breeds</h3>
+                <p>Perfect for families with children and first-time owners</p>
+                <div class="breed-examples">
+                    <span>Labrador Retriever</span>
+                    <span>Golden Retriever</span>
+                    <span>Beagle</span>
+                    <span>Bulldog</span>
+                    <span>Poodle</span>
+                </div>
+                <a href="{{ url_for('dogs') }}?energy_level=medium&size=medium,large" class="btn btn-outline btn-small">View Family Dogs</a>
+            </div>
+
+            <div class="breed-category-card">
+                <div class="category-icon">🏠</div>
+                <h3>Apartment Dogs</h3>
+                <p>Small breeds perfect for apartment living</p>
+                <div class="breed-examples">
+                    <span>French Bulldog</span>
+                    <span>Chihuahua</span>
+                    <span>Shih Tzu</span>
+                    <span>Maltese</span>
+                    <span>Pug</span>
+                </div>
+                <a href="{{ url_for('dogs') }}?size=small&energy_level=low,medium" class="btn btn-outline btn-small">View Apartment Dogs</a>
+            </div>
+
+            <div class="breed-category-card">
+                <div class="category-icon">⚡</div>
+                <h3>Active Breeds</h3>
+                <p>Energetic companions for active lifestyles</p>
+                <div class="breed-examples">
+                    <span>Border Collie</span>
+                    <span>Australian Shepherd</span>
+                    <span>Siberian Husky</span>
+                    <span>Irish Setter</span>
+                    <span>Dalmatian</span>
+                </div>
+                <a href="{{ url_for('dogs') }}?energy_level=high" class="btn btn-outline btn-small">View Active Dogs</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Can't Find Your Perfect Match?</h2>
+            <p>Join our waiting list and be the first to know when new dogs become available. We work with trusted breeders across Kenya to bring you the best selection.</p>
+            <div class="cta-actions">
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Create Free Account</a>
+                <a href="#" class="btn btn-outline">Contact Our Team</a>
+                <a href="#" class="btn btn-outline">Join Waiting List</a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Quick View Modal -->
+<div id="quickViewModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div id="quickViewContent">
+            <!-- Quick view content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<!-- Comparison Modal -->
+<div id="comparisonModal" class="modal">
+    <div class="modal-content large">
+        <span class="close-modal">&times;</span>
+        <div id="comparisonModalContent">
+            <!-- Comparison content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<style>
+/* Page Header */
+.page-header {
+    text-align: center;
+    margin: 2rem 0 3rem;
+    padding: 0 1rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.page-header p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Filters Section */
+.filters-section {
+    background: var(--secondary-color);
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: var(--radius-lg);
+}
+
+.filters-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Search Container */
+.search-container {
+    margin-bottom: 2rem;
+}
+
+.search-box {
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--background-color);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--border-color);
+}
+
+.search-box input {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.search-box input:focus {
+    outline: none;
+}
+
+.search-btn {
+    padding: 1rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.search-btn:hover {
+    background: var(--primary-dark);
+}
+
+.search-tips {
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.search-tips small {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* Filters Toggle */
+.filters-toggle {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Advanced Filters */
+.advanced-filters {
+    display: none;
+    background: var(--background-color);
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-top: 1rem;
+}
+
+.advanced-filters.active {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-group label {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.filter-select,
+.filter-input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--background-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.filter-select:focus,
+.filter-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.1);
+}
+
+.filter-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.filter-actions .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Results Header */
+.results-header {
+    margin-bottom: 2rem;
+}
+
+.results-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.results-count {
+    color: var(--primary-color);
+    font-weight: 600;
+    background: var(--secondary-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.9rem;
+}
+
+.view-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sort-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    background: var(--background-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.view-toggle {
+    display: flex;
+    background: var(--secondary-color);
+    border-radius: var(--radius);
+    padding: 0.25rem;
+}
+
+.view-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-light);
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: var(--transition);
+    font-size: 0.9rem;
+}
+
+.view-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Active Filters */
+.active-filters {
+    background: var(--secondary-color);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+}
+
+.active-filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.clear-all-filters {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    text-decoration: underline;
+}
+
+.active-filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.remove-filter {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.remove-filter:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Dogs Grid */
+.dogs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.dogs-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.dogs-grid.list-view .dog-card {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.5rem;
+}
+
+.dogs-grid.list-view .dog-image {
+    height: 200px;
+}
+
+/* Dog Card */
+.dog-card {
+    background: var(--background-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+}
+
+.dog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.dog-image {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.dog-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.dog-card:hover .dog-image img {
+    transform: scale(1.05);
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+}
+
+.placeholder-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.7;
+}
+
+.placeholder-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.status-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    z-index: 2;
+}
+
+.status-badge.available {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-badge.reserved {
+    background: var(--error-color);
+    color: white;
+}
+
+.breed-tag {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.card-actions {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.dog-card:hover .card-actions {
+    opacity: 1;
+}
+
+.wishlist-btn,
+.quick-view-btn,
+.compare-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.wishlist-btn:hover,
+.quick-view-btn:hover,
+.compare-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: scale(1.1);
+}
+
+.wishlist-btn.in-wishlist {
+    background: var(--error-color);
+    color: white;
+}
+
+/* Dog Info */
+.dog-info {
+    padding: 1.5rem;
+}
+
+.dog-header {
+    margin-bottom: 1rem;
+}
+
+.dog-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.dog-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.dog-breed {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.dog-age {
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+/* Dog Details Grid */
+.dog-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--secondary-color);
+    border-radius: var(--radius);
+}
+
+.detail-icon {
+    font-size: 1.1rem;
+    opacity: 0.7;
+}
+
+.detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.detail-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.energy-low { color: var(--success-color); }
+.energy-medium { color: var(--warning-color); }
+.energy-high { color: var(--error-color); }
+
+/* Dog Description */
+.dog-description {
+    margin-bottom: 1.5rem;
+}
+
+.dog-description p {
+    color: var(--text-light);
+    line-height: 1.5;
+    font-size: 0.95rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Dog Footer */
+.dog-footer {
+    margin-bottom: 1rem;
+}
+
+.price-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.price-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.price-badge {
+    background: var(--primary-light);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.price-note {
+    color: var(--text-light);
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-buttons .btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.btn-disabled {
+    background: var(--text-light) !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+/* Additional Info */
+.additional-info {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.info-icon {
+    font-size: 0.9rem;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--secondary-color);
+    border-radius: var(--radius-lg);
+    margin: 2rem 0;
+}
+
+.no-results-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
+}
+
+.no-results h3 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.no-results p {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.no-results-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.no-results-suggestions h4 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.suggestion-tags {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.suggestion-tag {
+    padding: 0.5rem 1rem;
+    background: var(--background-color);
+    color: var(--text-color);
+    text-decoration: none;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    border: 1px solid var(--border-color);
+}
+
+.suggestion-tag:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+/* Breed Guide Section */
+.breed-guide-section {
+    padding: 4rem 0;
+    background: var(--secondary-color);
+    margin: 3rem 0;
+}
+
+.breed-guide-section .section-header {
+    margin-bottom: 3rem;
+}
+
+.breed-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.breed-category-card {
+    background: var(--background-color);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.breed-category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.breed-category-card .category-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.breed-category-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.breed-category-card p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.breed-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.breed-examples span {
+    padding: 0.3rem 0.7rem;
+    background: var(--secondary-color);
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--text-color);
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 4rem 2rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.cta-content h2 {
+    margin-bottom: 1rem;
+    font-size: 2rem;
+}
+
+.cta-content p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.cta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content.large {
+    max-width: 900px;
+}
+
+.close-modal {
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-light);
+    background: none;
+    border: none;
+}
+
+.close-modal:hover {
+    color: var(--error-color);
+}
+
+/* Comparison Section */
+.comparison-section {
+    background: var(--secondary-color);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    margin: 2rem 0;
+}
+
+.comparison-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header h1 {
+        font-size: 2rem;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .results-info {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .view-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .dogs-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dogs-grid.list-view .dog-card {
+        grid-template-columns: 1fr;
+    }
+
+    .dog-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .price-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .breed-categories {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .cta-actions .btn {
+        width: 200px;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+    }
+
+    .filter-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 10px;
+    }
+
+    .page-header {
+        margin: 1.5rem 0;
+    }
+
+    .filters-section {
+        padding: 1.5rem 0;
+    }
+
+    .search-box {
+        flex-direction: column;
+    }
+
+    .search-box input {
+        border-radius: var(--radius) var(--radius) 0 0;
+    }
+
+    .search-btn {
+        border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    .advanced-filters {
+        padding: 1.5rem;
+    }
+
+    .modal-content {
+        margin: 10% auto;
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .dog-info {
+        padding: 1rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all functionality
+    initFilters();
+    initSearch();
+    initSorting();
+    initViewToggle();
+    initWishlist();
+    initQuickView();
+    initComparison();
+    initModals();
+
+    function initFilters() {
+        const toggleBtn = document.getElementById('toggleFilters');
+        const filtersPanel = document.getElementById('advancedFilters');
+        const applyBtn = document.getElementById('applyFilters');
+        const clearBtn = document.getElementById('clearFilters');
+        const clearAllBtn = document.getElementById('clearAllFilters');
+        const removeFilterBtns = document.querySelectorAll('.remove-filter');
+
+        // Toggle advanced filters
+        toggleBtn.addEventListener('click', function() {
+            filtersPanel.classList.toggle('active');
+            const arrow = this.querySelector('.toggle-arrow');
+            arrow.textContent = filtersPanel.classList.contains('active') ? '▲' : '▼';
+        });
+
+        // Apply filters
+        applyBtn.addEventListener('click', applyFilters);
+
+        // Clear all filters
+        clearBtn.addEventListener('click', clearFilters);
+        clearAllBtn?.addEventListener('click', clearFilters);
+
+        // Remove individual filters
+        removeFilterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                removeFilter(filter);
+            });
+        });
+
+        // Enter key in search
+        document.getElementById('globalSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                applyFilters();
+            }
+        });
+    }
+
+    function initSearch() {
+        const searchBtn = document.getElementById('searchButton');
+        const searchInput = document.getElementById('globalSearch');
+
+        searchBtn.addEventListener('click', performSearch);
+
+        // Real-time search suggestions could be added here
+    }
+
+    function initSorting() {
+        const sortSelect = document.getElementById('sortBy');
+        sortSelect.addEventListener('change', sortDogs);
+    }
+
+    function initViewToggle() {
+        const viewBtns = document.querySelectorAll('.view-btn');
+        const dogsGrid = document.getElementById('dogsGrid');
+
+        viewBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const viewType = this.getAttribute('data-view');
+                
+                // Update active button
+                viewBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update grid view
+                dogsGrid.className = `dogs-grid ${viewType}-view`;
+            });
+        });
+    }
+
+    function initWishlist() {
+        const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+
+        wishlistBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const dogId = this.getAttribute('data-dog-id');
+                const isInWishlist = this.classList.contains('in-wishlist');
+                
+                // Toggle visual state
+                this.classList.toggle('in-wishlist');
+                this.innerHTML = this.classList.contains('in-wishlist') ? '❤️' : '♡';
+                
+                // Send to backend
+                toggleWishlist(dogId, !isInWishlist);
+            });
+        });
+    }
+
+    function initQuickView() {
+        const quickViewBtns = document.querySelectorAll('.quick-view-btn');
+        quickViewBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const dogId = this.getAttribute('data-dog-id');
+                showQuickView(dogId);
+            });
+        });
+    }
+
+    function initComparison() {
+        const compareBtns = document.querySelectorAll('.compare-btn');
+        const clearComparisonBtn = document.getElementById('clearComparison');
+        const comparisonSection = document.getElementById('comparisonSection');
+
+        let comparisonList = [];
+
+        compareBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const dogId = this.getAttribute('data-dog-id');
+                const dogCard = this.closest('.dog-card');
+                const dogName = dogCard.querySelector('.dog-name').textContent;
+                const dogBreed = dogCard.querySelector('.dog-breed').textContent;
+                const dogPrice = dogCard.querySelector('.price-amount').textContent;
+                
+                // Add to comparison
+                if (!comparisonList.find(item => item.id === dogId)) {
+                    comparisonList.push({
+                        id: dogId,
+                        name: dogName,
+                        breed: dogBreed,
+                        price: dogPrice
+                    });
+                    
+                    updateComparisonView();
+                }
+            });
+        });
+
+        clearComparisonBtn?.addEventListener('click', function() {
+            comparisonList = [];
+            updateComparisonView();
+        });
+
+        function updateComparisonView() {
+            const comparisonGrid = document.getElementById('comparisonGrid');
+            
+            if (comparisonList.length > 0) {
+                comparisonSection.style.display = 'block';
+                comparisonGrid.innerHTML = comparisonList.map(dog => `
+                    <div class="comparison-item">
+                        <h4>${dog.name}</h4>
+                        <p>${dog.breed}</p>
+                        <p>${dog.price}</p>
+                        <button class="remove-comparison" data-id="${dog.id}">Remove</button>
+                    </div>
+                `).join('');
+                
+                // Add remove handlers
+                document.querySelectorAll('.remove-comparison').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        comparisonList = comparisonList.filter(dog => dog.id !== id);
+                        updateComparisonView();
+                    });
+                });
+            } else {
+                comparisonSection.style.display = 'none';
+            }
+        }
+    }
+
+    function initModals() {
+        const modals = document.querySelectorAll('.modal');
+        const closeBtns = document.querySelectorAll('.close-modal');
+
+        closeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+
+        window.addEventListener('click', function(event) {
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Core Functions
+    function applyFilters() {
+        const breed = document.getElementById('breed').value;
+        const ageCategory = document.getElementById('age_category').value;
+        const size = document.getElementById('size').value;
+        const energyLevel = document.getElementById('energy_level').value;
+        const priceRange = document.getElementById('price_range').value;
+        const color = document.getElementById('color').value;
+        const searchTerm = document.getElementById('globalSearch').value;
+
+        let url = new URL(window.location.href);
+        let params = new URLSearchParams();
+
+        if (breed) params.set('breed', breed);
+        if (ageCategory) params.set('age_category', ageCategory);
+        if (size) params.set('size', size);
+        if (energyLevel) params.set('energy_level', energyLevel);
+        if (priceRange) params.set('price_range', priceRange);
+        if (color) params.set('color', color);
+        if (searchTerm) params.set('search', searchTerm);
+
+        window.location.href = url.pathname + '?' + params.toString();
+    }
+
+    function clearFilters() {
+        window.location.href = "{{ url_for('dogs') }}";
+    }
+
+    function removeFilter(filterName) {
+        let url = new URL(window.location.href);
+        url.searchParams.delete(filterName);
+        window.location.href = url.toString();
+    }
+
+    function performSearch() {
+        applyFilters();
+    }
+
+    function sortDogs() {
+        const sortBy = this.value;
+        const dogCards = Array.from(document.querySelectorAll('.dog-card'));
+        const dogsGrid = document.getElementById('dogsGrid');
+
+        dogCards.sort((a, b) => {
+            switch(sortBy) {
+                case 'price_low':
+                    return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+                case 'price_high':
+                    return parseFloat(b.getAttribute('data-price')) - parseFloat(a.getAttribute('data-price'));
+                case 'name':
+                    return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+                case 'age':
+                    return parseFloat(a.getAttribute('data-age')) - parseFloat(b.getAttribute('data-age'));
+                case 'popular':
+                    // This would require backend data about popularity
+                    return 0;
+                case 'newest':
+                default:
+                    return 0;
+            }
+        });
+
+        // Clear and re-append sorted cards
+        dogsGrid.innerHTML = '';
+        dogCards.forEach(card => dogsGrid.appendChild(card));
+    }
+
+    function toggleWishlist(dogId, addToWishlist) {
+        fetch('/api/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                dog_id: dogId,
+                action: addToWishlist ? 'add' : 'remove'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const message = addToWishlist ? 'Added to wishlist' : 'Removed from wishlist';
+                showFlashMessage(message, 'success');
+            } else {
+                showFlashMessage('Operation failed', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showFlashMessage('Network error', 'error');
+        });
+    }
+
+    function showQuickView(dogId) {
+        // In a real implementation, this would fetch dog details from the server
+        const quickViewContent = document.getElementById('quickViewContent');
+        quickViewContent.innerHTML = `
+            <div class="quick-view-loading">
+                <h3>Loading Dog Details</h3>
+                <p>Please wait while we load the information...</p>
+                <div class="loading-spinner"></div>
+            </div>
+        `;
+        
+        document.getElementById('quickViewModal').style.display = 'block';
+
+        // Simulate API call
+        setTimeout(() => {
+            quickViewContent.innerHTML = `
+                <div class="quick-view-content">
+                    <h3>Quick View</h3>
+                    <p>Detailed information about the dog would appear here.</p>
+                    <p>This would include more photos, detailed description, health information, and more.</p>
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <a href="/dog/${dogId}" class="btn btn-primary">View Full Details</a>
+                    </div>
+                </div>
+            `;
+        }, 1000);
+    }
+
+    function showFlashMessage(message, type) {
+        // Create flash message element
+        const flash = document.createElement('div');
+        flash.className = `flash flash-${type}`;
+        flash.innerHTML = `
+            <span class="flash-icon">${type === 'success' ? '✅' : '❌'}</span>
+            <span class="flash-text">${message}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+        `;
+        
+        // Add to page
+        const flashContainer = document.getElementById('flashMessages') || createFlashContainer();
+        flashContainer.appendChild(flash);
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (flash.parentElement) {
+                flash.remove();
+            }
+        }, 5000);
+    }
+
+    function createFlashContainer() {
+        const container = document.createElement('div');
+        container.id = 'flashMessages';
+        container.className = 'flash-messages';
+        document.body.insertBefore(container, document.body.firstChild);
+        return container;
+    }
+
+    // Reset search filters
+    document.getElementById('resetSearchFilters')?.addEventListener('click', clearFilters);
+});
+</script>
+{% endblock %}

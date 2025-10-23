@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <h1>Manage Orders</h1>
+        <p>View and manage all adoption orders</p>
+    </div>
+</div>
+
+<div class="container">
+    <div style="margin: 2rem 0;">
+        <h2>All Orders ({{ orders|length }})</h2>
+    </div>
+
+    {% if orders %}
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: var(--secondary-color);">
+                    <th style="padding: 12px; text-align: left;">Order ID</th>
+                    <th style="padding: 12px; text-align: left;">Customer</th>
+                    <th style="padding: 12px; text-align: left;">Dog</th>
+                    <th style="padding: 12px; text-align: left;">Phone</th>
+                    <th style="padding: 12px; text-align: left;">Amount</th>
+                    <th style="padding: 12px; text-align: left;">Status</th>
+                    <th style="padding: 12px; text-align: left;">Date</th>
+                    <th style="padding: 12px; text-align: left;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px; font-family: monospace;">{{ order.id[:8] }}...</td>
+                    <td style="padding: 12px;">
+                        {{ order.user.first_name }} {{ order.user.last_name }}<br>
+                        <small style="color: #666;">{{ order.user.email }}</small>
+                    </td>
+                    <td style="padding: 12px;">{{ order.dog.name }} ({{ order.dog.breed }})</td>
+                    <td style="padding: 12px;">{{ order.mpesa_number }}</td>
+                    <td style="padding: 12px;">KES {{ "{:,.0f}".format(order.amount) }}</td>
+                    <td style="padding: 12px;">
+                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; 
+                            background: {% if order.status == 'completed' %}var(--success-color)
+                                      {% elif order.status == 'pending' %}#ffc107
+                                      {% else %}var(--error-color){% endif %};
+                            color: white;">
+                            {{ order.status|title }}
+                        </span>
+                    </td>
+                    <td style="padding: 12px;">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td style="padding: 12px;">
+                        {% if order.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('update_order_status', order_id=order.id) }}" style="display: inline;">
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit" class="btn" style="padding: 4px 8px; font-size: 0.8rem;">Mark Complete</button>
+                        </form>
+                        {% endif %}
+                        <a href="{{ url_for('order_details', order_id=order.id) }}" style="color: var(--primary-color); margin-left: 0.5rem;">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="form-container" style="text-align: center;">
+        <h3>No Orders Yet</h3>
+        <p>Orders will appear here when customers make purchases.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

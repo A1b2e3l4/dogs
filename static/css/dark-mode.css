@@ -1,0 +1,25 @@
+[data-theme="dark"] {
+    --background-color: #1a1a1a;
+    --text-color: #ffffff;
+    --secondary-color: #2d2d2d;
+    --border-color: #404040;
+    --primary-color: #a88c6c;
+}
+
+[data-theme="dark"] .hero {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+}
+
+[data-theme="dark"] .dog-card,
+[data-theme="dark"] .form-container,
+[data-theme="dark"] .stat-card {
+    background: #2d2d2d;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: #ffffff;
+}
