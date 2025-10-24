@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <h1>Add New Dog</h1>
+        <p>Add a new dog to the adoption platform</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="form-container">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Dog Name *</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="breed">Breed *</label>
+                    <select id="breed" name="breed" required>
+                        <option value="">Select Breed</option>
+                        {% for breed in breeds %}
+                        <option value="{{ breed }}">{{ breed }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age (years) *</label>
+                    <input type="number" id="age" name="age" min="0" max="20" step="0.5" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="size">Size *</label>
+                    <select id="size" name="size" required>
+                        <option value="">Select Size</option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="color">Color *</label>
+                    <input type="text" id="color" name="color" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="energy_level">Energy Level *</label>
+                    <select id="energy_level" name="energy_level" required>
+                        <option value="">Select Energy Level</option>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="price">Price (KES) *</label>
+                    <input type="number" id="price" name="price" min="0" step="1000" required>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="description">Description *</label>
+                    <textarea id="description" name="description" rows="4" required></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="image">Dog Image</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <small>Supported formats: PNG, JPG, JPEG, GIF (Max 2MB)</small>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button type="submit" class="btn">Add Dog</button>
+                <a href="{{ url_for('admin_dogs') }}" class="btn" style="background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); margin-left: 0.5rem;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

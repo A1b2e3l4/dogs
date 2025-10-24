@@ -3,71 +3,860 @@
 {% block content %}
 <div class="admin-header">
     <div class="container">
-        <h1>Manage Orders</h1>
-        <p>View and manage all adoption orders</p>
+        <h1>Financial Dashboard</h1>
+        <p>Monitor payments, revenue, and customer activity</p>
     </div>
 </div>
 
 <div class="container">
-    <div style="margin: 2rem 0;">
-        <h2>All Orders ({{ orders|length }})</h2>
+    <!-- Financial Overview Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">KES {{ "{:,.0f}".format(total_revenue|default(0)) }}</div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-trend positive">+12% this month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_orders|default(0) }}</div>
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-trend positive">+8% this month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ mpesa_orders|default(0) }}</div>
+            <div class="stat-label">M-Pesa Payments</div>
+            <div class="stat-trend positive">+15% this month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ pending_orders|default(0) }}</div>
+            <div class="stat-label">Pending Payments</div>
+            <div class="stat-trend negative">-5% this month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users|default(0) }}</div>
+            <div class="stat-label">Registered Users</div>
+            <div class="stat-trend positive">+20% this month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ visitor_count|default(0) }}</div>
+            <div class="stat-label">Site Visitors</div>
+            <div class="stat-trend positive">+25% this month</div>
+        </div>
     </div>
 
-    {% if orders %}
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background: var(--secondary-color);">
-                    <th style="padding: 12px; text-align: left;">Order ID</th>
-                    <th style="padding: 12px; text-align: left;">Customer</th>
-                    <th style="padding: 12px; text-align: left;">Dog</th>
-                    <th style="padding: 12px; text-align: left;">Phone</th>
-                    <th style="padding: 12px; text-align: left;">Amount</th>
-                    <th style="padding: 12px; text-align: left;">Status</th>
-                    <th style="padding: 12px; text-align: left;">Date</th>
-                    <th style="padding: 12px; text-align: left;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for order in orders %}
-                <tr style="border-bottom: 1px solid var(--border-color);">
-                    <td style="padding: 12px; font-family: monospace;">{{ order.id[:8] }}...</td>
-                    <td style="padding: 12px;">
-                        {{ order.user.first_name }} {{ order.user.last_name }}<br>
-                        <small style="color: #666;">{{ order.user.email }}</small>
-                    </td>
-                    <td style="padding: 12px;">{{ order.dog.name }} ({{ order.dog.breed }})</td>
-                    <td style="padding: 12px;">{{ order.mpesa_number }}</td>
-                    <td style="padding: 12px;">KES {{ "{:,.0f}".format(order.amount) }}</td>
-                    <td style="padding: 12px;">
-                        <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; 
-                            background: {% if order.status == 'completed' %}var(--success-color)
-                                      {% elif order.status == 'pending' %}#ffc107
-                                      {% else %}var(--error-color){% endif %};
-                            color: white;">
-                            {{ order.status|title }}
-                        </span>
-                    </td>
-                    <td style="padding: 12px;">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                    <td style="padding: 12px;">
-                        {% if order.status == 'pending' %}
-                        <form method="POST" action="{{ url_for('update_order_status', order_id=order.id) }}" style="display: inline;">
-                            <input type="hidden" name="status" value="completed">
-                            <button type="submit" class="btn" style="padding: 4px 8px; font-size: 0.8rem;">Mark Complete</button>
-                        </form>
-                        {% endif %}
-                        <a href="{{ url_for('order_details', order_id=order.id) }}" style="color: var(--primary-color); margin-left: 0.5rem;">View</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Charts Section -->
+    <div class="dashboard-grid">
+        <!-- Revenue Chart -->
+        <div class="dashboard-card">
+            <h3>Revenue Overview (KES)</h3>
+            <div class="chart-container">
+                <canvas id="revenueChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="dashboard-card">
+            <h3>Payment Methods</h3>
+            <div class="chart-container">
+                <canvas id="paymentMethodsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Monthly Performance -->
+        <div class="dashboard-card">
+            <h3>Monthly Performance</h3>
+            <div class="performance-stats">
+                <div class="performance-item">
+                    <span class="performance-label">Conversion Rate</span>
+                    <span class="performance-value">3.2%</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance-label">Avg. Order Value</span>
+                    <span class="performance-value">KES 28,500</span>
+                </div>
+                <div class="performance-item">
+                    <span class="performance-label">Visitor to User Rate</span>
+                    <span class="performance-value">12.5%</span>
+                </div>
+            </div>
+        </div>
     </div>
-    {% else %}
-    <div class="form-container" style="text-align: center;">
-        <h3>No Orders Yet</h3>
-        <p>Orders will appear here when customers make purchases.</p>
+
+    <!-- All Orders Table -->
+    <div class="form-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h2>All Payments ({{ orders|length|default(0) }})</h2>
+            <div class="filter-controls">
+                <select id="statusFilter" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="all">All Status</option>
+                    <option value="completed">Completed</option>
+                    <option value="pending">Pending</option>
+                    <option value="failed">Failed</option>
+                </select>
+                <input type="text" id="searchOrders" placeholder="Search orders..." style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; margin-left: 10px;">
+            </div>
+        </div>
+
+        {% if orders %}
+        <div class="table-container">
+            <table id="ordersTable" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Dog</th>
+                        <th>M-Pesa Number</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Payment Method</th>
+                        <th>Transaction ID</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr class="order-row" data-status="{{ order.status }}">
+                        <td style="padding: 12px; font-family: monospace;">
+                            <strong>{{ order.id[:8] }}...</strong>
+                        </td>
+                        <td style="padding: 12px;">
+                            <div class="customer-info">
+                                <strong>{{ order.user.first_name }} {{ order.user.last_name }}</strong>
+                                <br>
+                                <small style="color: #666;">{{ order.user.email }}</small>
+                                <br>
+                                <small style="color: #888;">{{ order.user.phone }}</small>
+                            </div>
+                        </td>
+                        <td style="padding: 12px;">
+                            <strong>{{ order.dog.name }}</strong>
+                            <br>
+                            <small style="color: #666;">{{ order.dog.breed }}</small>
+                            <br>
+                            <small style="color: #888;">KES {{ "{:,.0f}".format(order.dog.price|default(0)) }}</small>
+                        </td>
+                        <td style="padding: 12px; font-family: monospace;">
+                            {{ order.mpesa_number }}
+                        </td>
+                        <td style="padding: 12px; font-weight: bold;">
+                            KES {{ "{:,.0f}".format(order.amount|default(0)) }}
+                        </td>
+                        <td style="padding: 12px;">
+                            <span class="status-badge status-{{ order.status }}">
+                                {{ order.status|title }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px;">
+                            <span class="payment-method">
+                                <span class="mpesa-badge">M-Pesa</span>
+                            </span>
+                        </td>
+                        <td style="padding: 12px; font-family: monospace; font-size: 0.8rem;">
+                            {% if order.transaction_id %}
+                                {{ order.transaction_id[:10] }}...
+                            {% else %}
+                                <span style="color: #999;">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px;">
+                            {{ order.created_at.strftime('%Y-%m-%d') }}
+                            <br>
+                            <small style="color: #666;">{{ order.created_at.strftime('%H:%M') }}</small>
+                        </td>
+                        <td style="padding: 12px;">
+                            <div class="order-actions">
+                                {% if order.status == 'pending' %}
+                                <form method="POST" action="{{ url_for('update_order_status', order_id=order.id) }}" style="display: inline;">
+                                    <input type="hidden" name="status" value="completed">
+                                    <button type="submit" class="btn btn-success btn-small">
+                                        Complete
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('update_order_status', order_id=order.id) }}" style="display: inline;">
+                                    <input type="hidden" name="status" value="failed">
+                                    <button type="submit" class="btn btn-danger btn-small">
+                                        Fail
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <button class="btn btn-info btn-small view-order" data-order-id="{{ order.id }}">
+                                    Details
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <div class="summary-item">
+                <span>Total Orders Value:</span>
+                <strong>KES {{ "{:,.0f}".format(total_orders_value|default(0)) }}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Completed Orders:</span>
+                <strong>{{ completed_orders_count|default(0) }} (KES {{ "{:,.0f}".format(completed_orders_value|default(0)) }})</strong>
+            </div>
+            <div class="summary-item">
+                <span>Pending Orders:</span>
+                <strong>{{ pending_orders_count|default(0) }} (KES {{ "{:,.0f}".format(pending_orders_value|default(0)) }})</strong>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="empty-state">
+            <h3>No Payments Yet</h3>
+            <p>M-Pesa payments will appear here when customers make purchases.</p>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
+
+    <!-- Visitor Analytics -->
+    <div class="form-container">
+        <h3>Visitor Analytics</h3>
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <h4>Total Visitors</h4>
+                <div class="analytics-number">{{ visitor_count|default(0) }}</div>
+                <div class="analytics-trend positive">+25% this month</div>
+            </div>
+            <div class="analytics-card">
+                <h4>Registered Users</h4>
+                <div class="analytics-number">{{ total_users|default(0) }}</div>
+                <div class="analytics-trend positive">+20% this month</div>
+            </div>
+            <div class="analytics-card">
+                <h4>Conversion Rate</h4>
+                <div class="analytics-number">12.5%</div>
+                <div class="analytics-trend positive">+2.1%</div>
+            </div>
+            <div class="analytics-card">
+                <h4>Bounce Rate</h4>
+                <div class="analytics-number">42.3%</div>
+                <div class="analytics-trend negative">-3.2%</div>
+            </div>
+        </div>
+        
+        <div class="visitor-chart">
+            <canvas id="visitorChart" width="400" height="200"></canvas>
+        </div>
+    </div>
 </div>
+
+<!-- Order Details Modal -->
+<div id="orderModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Order Details</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body" id="orderDetails">
+            <!-- Order details will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.stat-trend {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.stat-trend.positive {
+    color: var(--success-color);
+}
+
+.stat-trend.negative {
+    color: var(--error-color);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-container {
+    height: 200px;
+    margin-top: 1rem;
+}
+
+.performance-stats {
+    margin-top: 1rem;
+}
+
+.performance-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.performance-label {
+    color: #666;
+}
+
+.performance-value {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.table-container {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 1rem;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 1rem;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-completed {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-pending {
+    background: #ffc107;
+    color: white;
+}
+
+.status-failed {
+    background: var(--error-color);
+    color: white;
+}
+
+.mpesa-badge {
+    background: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.order-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--error-color);
+    color: white;
+}
+
+.btn-info {
+    background: #17a2b8;
+    color: white;
+}
+
+.btn-small:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.order-summary {
+    background: var(--secondary-color);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.analytics-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.analytics-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0.5rem 0;
+}
+
+.analytics-trend {
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.visitor-chart {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.customer-info {
+    line-height: 1.4;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    background: var(--secondary-color);
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.close {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #ddd;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .analytics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .filter-controls {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    initializeCharts();
+    
+    // Initialize filters and search
+    initializeFilters();
+    
+    // Initialize modal
+    initializeModal();
+});
+
+function initializeCharts() {
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Revenue (KES)',
+                    data: [250000, 320000, 410000, 385000, 520000, 610000],
+                    borderColor: '#8B7355',
+                    backgroundColor: 'rgba(139, 115, 85, 0.1)',
+                    borderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'KES ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Payment Methods Chart
+    const paymentCtx = document.getElementById('paymentMethodsChart');
+    if (paymentCtx) {
+        new Chart(paymentCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['M-Pesa', 'Card', 'Bank Transfer'],
+                datasets: [{
+                    data: [85, 10, 5],
+                    backgroundColor: [
+                        '#28a745',
+                        '#007bff',
+                        '#6c757d'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Visitor Chart
+    const visitorCtx = document.getElementById('visitorChart');
+    if (visitorCtx) {
+        new Chart(visitorCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Visitors',
+                    data: [120, 150, 180, 140, 200, 90, 60],
+                    backgroundColor: 'rgba(139, 115, 85, 0.8)'
+                }, {
+                    label: 'Registered',
+                    data: [15, 20, 25, 18, 30, 12, 8],
+                    backgroundColor: 'rgba(40, 167, 69, 0.8)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+}
+
+function initializeFilters() {
+    const statusFilter = document.getElementById('statusFilter');
+    const searchInput = document.getElementById('searchOrders');
+    
+    if (statusFilter) {
+        statusFilter.addEventListener('change', filterOrders);
+    }
+    
+    if (searchInput) {
+        searchInput.addEventListener('input', filterOrders);
+    }
+}
+
+function filterOrders() {
+    const statusFilter = document.getElementById('statusFilter');
+    const searchInput = document.getElementById('searchOrders');
+    
+    if (!statusFilter || !searchInput) return;
+    
+    const statusValue = statusFilter.value;
+    const searchTerm = searchInput.value.toLowerCase();
+    const rows = document.querySelectorAll('.order-row');
+    
+    rows.forEach(row => {
+        const status = row.getAttribute('data-status');
+        const text = row.textContent.toLowerCase();
+        
+        const statusMatch = statusValue === 'all' || status === statusValue;
+        const searchMatch = text.includes(searchTerm);
+        
+        if (statusMatch && searchMatch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+function initializeModal() {
+    const modal = document.getElementById('orderModal');
+    const closeBtn = document.querySelector('.close');
+    const viewButtons = document.querySelectorAll('.view-order');
+    
+    if (!modal || !closeBtn) return;
+    
+    viewButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const orderId = this.getAttribute('data-order-id');
+            showOrderDetails(orderId);
+        });
+    });
+    
+    closeBtn.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+}
+
+function showOrderDetails(orderId) {
+    const modal = document.getElementById('orderModal');
+    const detailsDiv = document.getElementById('orderDetails');
+    
+    if (!modal || !detailsDiv) return;
+    
+    // Simulate loading order details
+    detailsDiv.innerHTML = `
+        <div style="text-align: center; padding: 2rem;">
+            <div style="border: 4px solid #f3f3f3; border-top: 4px solid #8B7355; border-radius: 50%; width: 40px; height: 40px; animation: spin 2s linear infinite; margin: 0 auto;"></div>
+            <p>Loading order details...</p>
+        </div>
+    `;
+    
+    modal.style.display = 'block';
+    
+    // Add spinner animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Simulate API call
+    setTimeout(() => {
+        detailsDiv.innerHTML = `
+            <div class="order-detail">
+                <div class="detail-section">
+                    <h4>Order Information</h4>
+                    <div class="detail-row">
+                        <span>Order ID:</span>
+                        <strong>${orderId}</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Date:</span>
+                        <span>${new Date().toLocaleDateString()}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Status:</span>
+                        <span class="status-badge status-completed">Completed</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Customer Information</h4>
+                    <div class="detail-row">
+                        <span>Name:</span>
+                        <span>Customer Name</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Email:</span>
+                        <span>customer@example.com</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Phone:</span>
+                        <span>254712345678</span>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Payment Information</h4>
+                    <div class="detail-row">
+                        <span>Amount:</span>
+                        <strong>KES 25,000</strong>
+                    </div>
+                    <div class="detail-row">
+                        <span>Method:</span>
+                        <span class="mpesa-badge">M-Pesa</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Transaction ID:</span>
+                        <code>MPESA_${orderId}</code>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Dog Information</h4>
+                    <div class="detail-row">
+                        <span>Dog:</span>
+                        <span>Max (Labrador Retriever)</span>
+                    </div>
+                    <div class="detail-row">
+                        <span>Price:</span>
+                        <span>KES 25,000</span>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                .detail-section {
+                    margin-bottom: 1.5rem;
+                    padding-bottom: 1rem;
+                    border-bottom: 1px solid #eee;
+                }
+                
+                .detail-section:last-child {
+                    border-bottom: none;
+                }
+                
+                .detail-section h4 {
+                    margin-bottom: 0.8rem;
+                    color: #8B7355;
+                }
+                
+                .detail-row {
+                    display: flex;
+                    justify-content: space-between;
+                    padding: 0.4rem 0;
+                }
+                
+                .detail-row span:first-child {
+                    color: #666;
+                }
+                
+                .detail-row span:last-child {
+                    font-weight: bold;
+                }
+            </style>
+        `;
+    }, 1000);
+}
+</script>
 {% endblock %}

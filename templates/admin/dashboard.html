@@ -40,45 +40,226 @@
         </div>
     </div>
 
-    <!-- Recent Orders -->
-    <div class="form-container">
-        <h3>Recent Orders</h3>
-        {% if recent_orders %}
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-                <thead>
-                    <tr style="background: var(--secondary-color);">
-                        <th style="padding: 12px; text-align: left;">Order ID</th>
-                        <th style="padding: 12px; text-align: left;">Customer</th>
-                        <th style="padding: 12px; text-align: left;">Dog</th>
-                        <th style="padding: 12px; text-align: left;">Amount</th>
-                        <th style="padding: 12px; text-align: left;">Status</th>
-                        <th style="padding: 12px; text-align: left;">Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in recent_orders %}
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                        <td style="padding: 12px;">{{ order.id[:8] }}...</td>
-                        <td style="padding: 12px;">{{ order.user.first_name }} {{ order.user.last_name }}</td>
-                        <td style="padding: 12px;">{{ order.dog.name }}</td>
-                        <td style="padding: 12px;">KES {{ "{:,.0f}".format(order.amount) }}</td>
-                        <td style="padding: 12px;">
-                            <span style="padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; 
-                                background: {% if order.status == 'completed' %}var(--success-color){% elif order.status == 'pending' %}#ffc107{% else %}var(--error-color){% endif %};
-                                color: white;">
-                                {{ order.status|title }}
-                            </span>
-                        </td>
-                        <td style="padding: 12px;">{{ order.created_at.strftime('%Y-%m-%d') }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Recent Data Grid -->
+    <div class="dashboard-grid">
+        <!-- Recent Orders -->
+        <div class="dashboard-card">
+            <h3>Recent Orders</h3>
+            {% if recent_orders %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Dog</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td>{{ order.id[:8] }}...</td>
+                            <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                            <td>{{ order.dog.name }}</td>
+                            <td>KES {{ "{:,.0f}".format(order.amount) }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status }}">
+                                    {{ order.status|title }}
+                                </span>
+                            </td>
+                            <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="{{ url_for('admin_orders') }}" class="btn">View All Orders</a>
+            </div>
+            {% else %}
+            <p style="text-align: center; padding: 2rem; color: #666;">No recent orders</p>
+            {% endif %}
         </div>
-        {% else %}
-        <p style="text-align: center; padding: 2rem; color: #666;">No recent orders</p>
-        {% endif %}
+
+        <!-- Recent Users -->
+        <div class="dashboard-card">
+            <h3>Recent Users</h3>
+            {% if recent_users %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in recent_users %}
+                        <tr>
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone }}</td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="{{ url_for('admin_users') }}" class="btn">View All Users</a>
+            </div>
+            {% else %}
+            <p style="text-align: center; padding: 2rem; color: #666;">No users registered</p>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<style>
+/* Stats Grid Styles */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border-left: 4px solid var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Dashboard Grid Styles */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.dashboard-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.dashboard-card h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--secondary-color);
+    padding-bottom: 0.5rem;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--secondary-color);
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tr:hover {
+    background: #f9f9f9;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: #ffc107;
+    color: white;
+}
+
+.status-completed {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-failed {
+    background: var(--error-color);
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-card {
+        padding: 1rem;
+    }
+}
+</style>
 {% endblock %}

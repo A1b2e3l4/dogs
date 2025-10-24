@@ -2,95 +2,181 @@
 
 {% block content %}
 <div class="container">
-    <div style="max-width: 1000px; margin: 0 auto;">
+    <div style="max-width: 1200px; margin: 0 auto;">
         <!-- Breadcrumb -->
-        <nav style="margin: 1rem 0;">
-            <a href="{{ url_for('index') }}">Home</a> &gt;
-            <a href="{{ url_for('dogs') }}">Dogs</a> &gt;
-            <span>{{ dog.name }}</span>
+        <nav style="margin: 1rem 0; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="{{ url_for('index') }}" style="color: var(--primary-color); text-decoration: none;">🏠 Home</a>
+            <span style="color: #666;">›</span>
+            <a href="{{ url_for('dogs') }}" style="color: var(--primary-color); text-decoration: none;">🐕 All Dogs</a>
+            <span style="color: #666;">›</span>
+            <span style="color: #333; font-weight: 500;">{{ dog.name }}</span>
         </nav>
         
         <div class="dog-detail" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin: 2rem 0;">
             <!-- Dog Images -->
             <div>
-                <div class="dog-image" style="border-radius: 10px; overflow: hidden; margin-bottom: 1rem;">
+                <div class="dog-image-main" style="border-radius: 15px; overflow: hidden; margin-bottom: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
                     {% if dog.image_url %}
                     <img src="{{ dog.image_url }}" alt="{{ dog.name }}" style="width: 100%; height: 400px; object-fit: cover;">
                     {% else %}
-                    <div style="width: 100%; height: 400px; background: var(--secondary-color); display: flex; align-items: center; justify-content: center;">
-                        <span style="font-size: 6rem;">🐕</span>
+                    <div style="width: 100%; height: 400px; background: linear-gradient(135deg, var(--secondary-color), #e8e8e8); display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 6rem; opacity: 0.7;">🐕</span>
                     </div>
                     {% endif %}
+                </div>
+                
+                <!-- Additional Images Placeholder -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+                    {% for i in range(4) %}
+                    <div style="aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: var(--secondary-color); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        {% if dog.image_url %}
+                        <img src="{{ dog.image_url }}" alt="{{ dog.name }} {{ i+1 }}" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.7;">
+                        {% else %}
+                        <span style="font-size: 1.5rem; opacity: 0.5;">🐕</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
             
             <!-- Dog Information -->
             <div>
-                <h1 style="color: var(--primary-color); margin-bottom: 0.5rem;">{{ dog.name }}</h1>
-                <p style="font-size: 1.2rem; color: #666; margin-bottom: 1.5rem;">{{ dog.breed }}</p>
+                <div style="margin-bottom: 1.5rem;">
+                    <h1 style="color: var(--primary-color); margin-bottom: 0.5rem; font-size: 2.5rem;">{{ dog.name }}</h1>
+                    <p style="font-size: 1.3rem; color: #666; margin-bottom: 0.5rem; font-weight: 500;">{{ dog.breed }}</p>
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <span class="status-badge {{ 'available' if dog.is_available else 'unavailable' }}">
+                            {{ 'Available' if dog.is_available else 'Adopted' }}
+                        </span>
+                        <span style="color: #666;">•</span>
+                        <span style="color: #666;">Added {{ dog.created_at.strftime('%B %d, %Y') if dog.created_at else 'Recently' }}</span>
+                    </div>
+                </div>
                 
-                <div class="price" style="font-size: 2rem; margin-bottom: 2rem;">
+                <!-- Price -->
+                <div class="price" style="font-size: 2.5rem; margin-bottom: 2rem; color: var(--primary-color); font-weight: bold;">
                     KES {{ "{:,.0f}".format(dog.price) }}
                 </div>
                 
-                <!-- Dog Details Grid -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                    <div class="detail-item">
-                        <strong>Age:</strong> {{ dog.age }} year{{ 's' if dog.age != 1 }}
+                <!-- Quick Stats -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value">{{ dog.age }} year{{ 's' if dog.age != 1 }}</div>
+                        <div class="stat-label">Age</div>
                     </div>
-                    <div class="detail-item">
-                        <strong>Age Category:</strong> <span style="text-transform: capitalize;">{{ dog.age_category }}</span>
+                    <div class="stat-card">
+                        <div class="stat-icon">📏</div>
+                        <div class="stat-value" style="text-transform: capitalize;">{{ dog.size }}</div>
+                        <div class="stat-label">Size</div>
                     </div>
-                    <div class="detail-item">
-                        <strong>Size:</strong> <span style="text-transform: capitalize;">{{ dog.size }}</span>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚡</div>
+                        <div class="stat-value" style="text-transform: capitalize;">{{ dog.energy_level }}</div>
+                        <div class="stat-label">Energy</div>
                     </div>
-                    <div class="detail-item">
-                        <strong>Color:</strong> {{ dog.color }}
-                    </div>
-                    <div class="detail-item">
-                        <strong>Energy Level:</strong> <span style="text-transform: capitalize;">{{ dog.energy_level }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <strong>Status:</strong> 
-                        <span style="color: var(--success-color); font-weight: bold;">Available</span>
+                </div>
+                
+                <!-- Detailed Information -->
+                <div class="details-section" style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Details</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="detail-item">
+                            <span class="detail-label">Breed:</span>
+                            <span class="detail-value">{{ dog.breed }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Age Category:</span>
+                            <span class="detail-value" style="text-transform: capitalize;">{{ dog.age_category }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Color:</span>
+                            <span class="detail-value">{{ dog.color }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Temperament:</span>
+                            <span class="detail-value" style="text-transform: capitalize;">{{ dog.energy_level }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Good With:</span>
+                            <span class="detail-value">Families, Kids, Other Pets</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Health:</span>
+                            <span class="detail-value">Vaccinated, Dewormed</span>
+                        </div>
                     </div>
                 </div>
                 
                 <!-- Description -->
                 <div style="margin-bottom: 2rem;">
-                    <h3>About {{ dog.name }}</h3>
-                    <p style="line-height: 1.6;">{{ dog.description }}</p>
+                    <h3 style="margin-bottom: 1rem; color: var(--primary-color);">About {{ dog.name }}</h3>
+                    <div style="background: var(--secondary-color); padding: 1.5rem; border-radius: 10px; line-height: 1.7;">
+                        {{ dog.description }}
+                    </div>
+                </div>
+                
+                <!-- Care Requirements -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Care Requirements</h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                        <div class="care-item">
+                            <span class="care-icon">🍗</span>
+                            <span>High-quality dog food</span>
+                        </div>
+                        <div class="care-item">
+                            <span class="care-icon">🚶</span>
+                            <span>Daily exercise needed</span>
+                        </div>
+                        <div class="care-item">
+                            <span class="care-icon">💇</span>
+                            <span>Regular grooming</span>
+                        </div>
+                        <div class="care-item">
+                            <span class="care-icon">🏠</span>
+                            <span>Loving home</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Action Buttons -->
-                <div>
+                <div style="margin-bottom: 1.5rem;">
                     {% if current_user.is_authenticated %}
                         {% if dog.is_available %}
-                            <a href="{{ url_for('checkout', dog_id=dog.id) }}" class="btn" style="font-size: 1.1rem; padding: 15px 30px;">
-                                Adopt {{ dog.name }} - KES {{ "{:,.0f}".format(dog.price) }}
-                            </a>
+                            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                                <a href="{{ url_for('checkout', dog_id=dog.id) }}" class="btn" style="font-size: 1.1rem; padding: 15px 30px; flex: 1;">
+                                    🏠 Adopt {{ dog.name }}
+                                </a>
+                                <button class="btn" style="background: transparent; color: var(--primary-color); border: 2px solid var(--primary-color);">
+                                    ❤️ Add to Wishlist
+                                </button>
+                            </div>
                         {% else %}
-                            <button class="btn" disabled style="background: #ccc; font-size: 1.1rem; padding: 15px 30px;">
-                                Currently Unavailable
+                            <button class="btn" disabled style="background: #ccc; font-size: 1.1rem; padding: 15px 30px; width: 100%;">
+                                🏠 Already Adopted
                             </button>
                         {% endif %}
                     {% else %}
-                        <a href="{{ url_for('login', next=url_for('checkout', dog_id=dog.id)) }}" class="btn" style="font-size: 1.1rem; padding: 15px 30px;">
-                            Login to Adopt
+                        <a href="{{ url_for('login', next=url_for('checkout', dog_id=dog.id)) }}" class="btn" style="font-size: 1.1rem; padding: 15px 30px; width: 100%;">
+                            🔐 Login to Adopt {{ dog.name }}
                         </a>
                     {% endif %}
                 </div>
                 
                 <!-- M-Pesa Note -->
-                <div class="mpesa-note" style="margin-top: 1.5rem;">
-                    <p>💡 <strong>M-Pesa Payment:</strong> Secure payment via M-Pesa. You'll receive a prompt on your phone to complete the transaction.</p>
+                <div class="mpesa-note" style="background: #e8f5e8; padding: 1rem; border-radius: 8px; border-left: 4px solid var(--success-color);">
+                    <p style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.2rem;">💳</span>
+                        <strong>M-Pesa Payment:</strong> Secure payment via M-Pesa. You'll receive a prompt on your phone to complete the transaction.
+                    </p>
                 </div>
             </div>
         </div>
         
         <!-- Similar Dogs Section -->
+        {% if similar_dogs %}
         <div style="margin: 4rem 0;">
-            <h2 style="text-align: center; margin-bottom: 2rem;">Similar Dogs</h2>
+            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--primary-color);">You Might Also Like</h2>
             <div class="dogs-grid">
                 {% for similar_dog in similar_dogs %}
                 {% if similar_dog.id != dog.id and similar_dog.is_available %}
@@ -101,14 +187,26 @@
                         {% else %}
                         <span style="font-size: 4rem;">🐕</span>
                         {% endif %}
+                        <div class="dog-overlay">
+                            <a href="{{ url_for('dog_detail', dog_id=similar_dog.id) }}" class="btn" style="background: rgba(255,255,255,0.9); color: var(--primary-color);">
+                                View Details
+                            </a>
+                        </div>
                     </div>
                     <div class="dog-info">
                         <h3>{{ similar_dog.name }}</h3>
-                        <p><strong>Breed:</strong> {{ similar_dog.breed }}</p>
-                        <p><strong>Age:</strong> {{ similar_dog.age }} year{{ 's' if similar_dog.age != 1 }}</p>
-                        <div class="price">KES {{ "{:,.0f}".format(similar_dog.price) }}</div>
+                        <p style="color: #666; margin-bottom: 0.5rem;">{{ similar_dog.breed }}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span style="color: #666;">{{ similar_dog.age }} year{{ 's' if similar_dog.age != 1 }}</span>
+                            <span style="text-transform: capitalize; background: var(--secondary-color); padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">
+                                {{ similar_dog.size }}
+                            </span>
+                        </div>
+                        <div class="price" style="font-size: 1.3rem; font-weight: bold; color: var(--primary-color); margin-bottom: 1rem;">
+                            KES {{ "{:,.0f}".format(similar_dog.price) }}
+                        </div>
                         <a href="{{ url_for('dog_detail', dog_id=similar_dog.id) }}" class="btn" style="display: block; text-align: center;">
-                            View Details
+                            Meet {{ similar_dog.name }}
                         </a>
                     </div>
                 </div>
@@ -116,20 +214,122 @@
                 {% endfor %}
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
 <style>
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-badge.available {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-badge.unavailable {
+    background: #ccc;
+    color: #666;
+}
+
+.stat-card {
+    text-align: center;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border-radius: 10px;
+    transition: transform 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0.2rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
 .detail-item {
+    display: flex;
+    justify-content: space-between;
     padding: 0.8rem;
     background: var(--secondary-color);
-    border-radius: 5px;
+    border-radius: 8px;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #666;
+}
+
+.detail-value {
+    font-weight: 500;
+}
+
+.care-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--secondary-color);
+    border-radius: 6px;
+}
+
+.care-icon {
+    font-size: 1.2rem;
+}
+
+.dog-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dog-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.dog-card:hover .dog-overlay {
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
     .dog-detail {
         grid-template-columns: 1fr !important;
         gap: 2rem !important;
+    }
+    
+    .details-section > div {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .stat-card {
+        padding: 0.8rem;
     }
 }
 </style>

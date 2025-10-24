@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="container">
+        <h1>Manage Users</h1>
+        <p>View and manage all registered users</p>
+    </div>
+</div>
+
+<div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin: 2rem 0;">
+        <h2>All Users ({{ users|length }})</h2>
+        <div class="search-box">
+            <input type="text" id="userSearch" placeholder="Search users..." style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 250px;">
+        </div>
+    </div>
+
+    {% if users %}
+    <div class="table-container">
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Profile</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Verified</th>
+                    <th>Admin</th>
+                    <th>Orders</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="user-row">
+                    <td class="user-id">#{{ user.id }}</td>
+                    <td>
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture }}" alt="{{ user.first_name }}" class="profile-pic">
+                        {% else %}
+                            <div class="profile-placeholder">
+                                {{ user.first_name[0] }}{{ user.last_name[0] }}
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>
+                        <span class="status-badge {% if user.is_verified %}status-completed{% else %}status-pending{% endif %}">
+                            {{ 'Yes' if user.is_verified else 'No' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge {% if user.is_admin %}status-completed{% else %}status-failed{% endif %}">
+                            {{ 'Yes' if user.is_admin else 'No' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="order-count">{{ user.orders|length }}</span>
+                    </td>
+                    <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>
+                        <div class="user-actions">
+                            {% if not user.is_admin and user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('toggle_user_status', user_id=user.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-small btn-{% if user.is_verified %}warning{% else %}success{% endif %}">
+                                    {{ 'Deactivate' if user.is_verified else 'Activate' }}
+                                </button>
+                            </form>
+                            {% elif user.is_admin %}
+                            <span class="admin-label">System Admin</span>
+                            {% else %}
+                            <span class="admin-label">Current User</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- User Statistics -->
+    <div class="stats-grid" style="margin-top: 2rem;">
+        <div class="stat-card">
+            <div class="stat-number">{{ users|length }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ users|selectattr('is_verified')|list|length }}</div>
+            <div class="stat-label">Verified Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ users|selectattr('is_admin')|list|length }}</div>
+            <div class="stat-label">Admin Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ users|rejectattr('is_verified')|list|length }}</div>
+            <div class="stat-label">Unverified Users</div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="form-container" style="text-align: center;">
+        <h3>No Users Registered</h3>
+        <p>Users will appear here when they register.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+/* Table Styles */
+.table-container {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--secondary-color);
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary-color);
+    position: sticky;
+    top: 0;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+tr:hover {
+    background: #f9f9f9;
+}
+
+/* Profile Picture Styles */
+.profile-pic {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--secondary-color);
+}
+
+.profile-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: #ffc107;
+    color: white;
+}
+
+.status-completed {
+    background: var(--success-color);
+    color: white;
+}
+
+.status-failed {
+    background: var(--error-color);
+    color: white;
+}
+
+/* Button Styles */
+.user-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-warning {
+    background: #ffc107;
+    color: white;
+}
+
+.btn-small:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Order Count */
+.order-count {
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    min-width: 30px;
+    text-align: center;
+    display: inline-block;
+}
+
+/* Admin Label */
+.admin-label {
+    background: #6c757d;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Search Box */
+.search-box {
+    margin-bottom: 1rem;
+}
+
+.search-box input {
+    width: 100%;
+    max-width: 300px;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.stat-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+    border-left: 4px solid var(--primary-color);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .user-actions {
+        flex-direction: column;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    th, td {
+        padding: 8px 4px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .search-box input {
+        width: 100%;
+        max-width: none;
+    }
+}
+</style>
+
+<script>
+// Search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.user-row');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Sort functionality
+    let sortDirection = true;
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById('usersTable');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        
+        rows.sort((a, b) => {
+            const aValue = a.cells[columnIndex].textContent;
+            const bValue = b.cells[columnIndex].textContent;
+            
+            if (sortDirection) {
+                return aValue.localeCompare(bValue);
+            } else {
+                return bValue.localeCompare(aValue);
+            }
+        });
+        
+        // Remove existing rows
+        rows.forEach(row => tbody.removeChild(row));
+        
+        // Add sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+        
+        sortDirection = !sortDirection;
+    }
+
+    // Add click handlers to table headers for sorting
+    document.querySelectorAll('th').forEach((th, index) => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => sortTable(index));
+    });
+});
+</script>
+{% endblock %}

@@ -58,90 +58,651 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def send_verification_email(user_email, verification_code):
+def send_verification_email(user_email, verification_code, user_name):
     try:
-        msg = Message('Woofcare - Email Verification',
-                      recipients=[user_email])
-        msg.html = f"""
+        msg = Message('Woofcare - Email Verification', recipients=[user_email])
+        
+        # Create the email HTML with proper escaping for CSS in Python string
+        email_html = f"""
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Woofcare - Email Verification</title>
             <style>
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+                
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }}
+                
                 body {{
-                    font-family: 'Arial', sans-serif;
+                    font-family: 'Poppins', sans-serif;
                     line-height: 1.6;
                     color: #333;
-                    max-width: 600px;
-                    margin: 0 auto;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                     padding: 20px;
                 }}
+                
+                .email-container {{
+                    max-width: 600px;
+                    width: 100%;
+                    background: white;
+                    border-radius: 20px;
+                    overflow: hidden;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                }}
+                
                 .header {{
+                    background: linear-gradient(135deg, #8B7355 0%, #a88c6c 50%, #c5a57f 100%);
+                    color: white;
+                    padding: 40px 30px;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden;
+                }}
+                
+                .logo {{
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                    display: inline-block;
+                }}
+                
+                .header h1 {{
+                    font-size: 2.2rem;
+                    margin-bottom: 10px;
+                    position: relative;
+                    z-index: 2;
+                }}
+                
+                .header p {{
+                    font-size: 1.1rem;
+                    opacity: 0.9;
+                    position: relative;
+                    z-index: 2;
+                }}
+                
+                .content {{
+                    padding: 40px 30px;
+                    background: #f9f9f9;
+                }}
+                
+                .welcome-message {{
+                    background: linear-gradient(135deg, #667eea, #764ba2);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
+                    text-align: center;
+                }}
+                
+                .welcome-message h2 {{
+                    font-size: 1.5rem;
+                    margin-bottom: 10px;
+                }}
+                
+                .user-name {{
+                    font-weight: 600;
+                    color: #FFD700;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                }}
+                
+                .verification-section {{
+                    text-align: center;
+                    margin: 30px 0;
+                }}
+                
+                .verification-code {{
                     background: linear-gradient(135deg, #8B7355, #a88c6c);
                     color: white;
-                    padding: 30px;
-                    text-align: center;
-                    border-radius: 10px 10px 0 0;
-                }}
-                .content {{
-                    background: #f9f9f9;
-                    padding: 30px;
-                    border-radius: 0 0 10px 10px;
-                }}
-                .verification-code {{
-                    background: #8B7355;
-                    color: white;
-                    padding: 20px;
-                    font-size: 2rem;
+                    padding: 25px;
+                    font-size: 2.5rem;
                     font-weight: bold;
                     text-align: center;
-                    border-radius: 8px;
-                    letter-spacing: 5px;
-                    margin: 20px 0;
+                    border-radius: 15px;
+                    letter-spacing: 8px;
+                    margin: 25px 0;
+                    box-shadow: 0 10px 20px rgba(139, 115, 85, 0.3);
+                    position: relative;
+                    overflow: hidden;
                 }}
+                
+                .instructions {{
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 25px 0;
+                    border-left: 4px solid #8B7355;
+                }}
+                
+                .steps {{
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 30px 0;
+                }}
+                
+                .step {{
+                    text-align: center;
+                    flex: 1;
+                    padding: 15px;
+                }}
+                
+                .step-icon {{
+                    width: 60px;
+                    height: 60px;
+                    background: #8B7355;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 15px;
+                    font-size: 1.5rem;
+                }}
+                
+                .step-text {{
+                    font-size: 0.9rem;
+                    color: #666;
+                }}
+                
+                .security-note {{
+                    background: #fff3cd;
+                    border: 1px solid #ffeaa7;
+                    color: #856404;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    text-align: center;
+                }}
+                
                 .footer {{
                     text-align: center;
-                    margin-top: 30px;
-                    padding-top: 20px;
+                    margin-top: 40px;
+                    padding-top: 30px;
                     border-top: 1px solid #ddd;
                     color: #666;
                     font-size: 0.9rem;
                 }}
+                
+                .social-links {{
+                    display: flex;
+                    justify-content: center;
+                    gap: 15px;
+                    margin: 20px 0;
+                }}
+                
+                .social-link {{
+                    width: 40px;
+                    height: 40px;
+                    background: #8B7355;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-decoration: none;
+                }}
+                
+                @media (max-width: 768px) {{
+                    .steps {{
+                        flex-direction: column;
+                        gap: 15px;
+                    }}
+                    
+                    .verification-code {{
+                        font-size: 2rem;
+                        letter-spacing: 5px;
+                        padding: 20px;
+                    }}
+                    
+                    .header {{
+                        padding: 30px 20px;
+                    }}
+                    
+                    .content {{
+                        padding: 30px 20px;
+                    }}
+                }}
             </style>
         </head>
         <body>
-            <div class="header">
-                <h1>Woofcare</h1>
-                <p>Find Your Perfect Companion</p>
-            </div>
-            
-            <div class="content">
-                <h2>Verify Your Email Address</h2>
-                <p>Hello!</p>
-                <p>Thank you for joining Woofcare! To complete your registration and start browsing our lovely dogs, please verify your email address using the code below:</p>
-                
-                <div class="verification-code">
-                    {verification_code}
+            <div class="email-container">
+                <div class="header">
+                    <div class="logo">🐕 Woofcare</div>
+                    <h1>Find Your Perfect Companion</h1>
+                    <p>Where tails wag and hearts connect</p>
                 </div>
                 
-                <p>Enter this code on the verification page to activate your account. This code will expire in 1 hour for security reasons.</p>
+                <div class="content">
+                    <!-- Welcome Message with User's Name -->
+                    <div class="welcome-message">
+                        <h2>Welcome to Woofcare, <span class="user-name">{user_name}</span>! 🎉</h2>
+                        <p>We're thrilled to have you join our community of dog lovers</p>
+                    </div>
+                    
+                    <h2 style="text-align: center; margin-bottom: 20px; color: #8B7355;">Verify Your Email Address</h2>
+                    
+                    <p style="text-align: center; margin-bottom: 25px; font-size: 1.1rem;">
+                        Hello <strong>{user_name}</strong>! Thank you for choosing Woofcare to find your perfect furry friend. 
+                        To complete your registration and start browsing our lovely dogs, please verify your email address.
+                    </p>
+                    
+                    <div class="verification-section">
+                        <p style="margin-bottom: 15px; font-weight: 500;">Your verification code is:</p>
+                        
+                        <div class="verification-code">
+                            {verification_code}
+                        </div>
+                        
+                        <p style="color: #666; font-size: 0.95rem;">
+                            Enter this code on the verification page to activate your account
+                        </p>
+                    </div>
+                    
+                    <!-- Steps Instructions -->
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-icon">1</div>
+                            <div class="step-text">Copy the verification code</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">2</div>
+                            <div class="step-text">Return to Woofcare</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">3</div>
+                            <div class="step-text">Enter the code & start exploring!</div>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p style="margin-bottom: 10px;"><strong>Quick Tip:</strong> Keep this code secure and don't share it with anyone.</p>
+                        <p>Once verified, you'll be able to browse dogs, save favorites, and start your adoption journey!</p>
+                    </div>
+                    
+                    <div class="security-note">
+                        ⚠️ <strong>Security Notice:</strong> This code will expire in <strong>1 hour</strong> for your protection.
+                    </div>
+                    
+                    <p style="text-align: center; margin: 25px 0; color: #666;">
+                        If you didn't create an account with Woofcare, please ignore this email or 
+                        <a href="mailto:support@woofcare.com" style="color: #8B7355;">contact our support team</a>.
+                    </p>
+                    
+                    <p style="text-align: center; font-size: 1.1rem;">
+                        Best regards,<br>
+                        <strong>The Woofcare Team</strong> 🐶
+                    </p>
+                </div>
                 
-                <p>If you didn't create an account with Woofcare, please ignore this email.</p>
-                
-                <p>Best regards,<br>The Woofcare Team</p>
-            </div>
-            
-            <div class="footer">
-                <p>&copy; 2024 Woofcare. All rights reserved.</p>
-                <p>Nairobi, Kenya</p>
+                <div class="footer">
+                    <div class="social-links">
+                        <a href="#" class="social-link">📘</a>
+                        <a href="#" class="social-link">📷</a>
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">💼</a>
+                    </div>
+                    <p>&copy; 2025 Woofcare. All rights reserved.</p>
+                    <p>Nairobi, Kenya | <a href="#" style="color: #8B7355;">Unsubscribe</a></p>
+                    <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.7;">
+                        Bringing joy, one paw at a time 🐾
+                    </p>
+                </div>
             </div>
         </body>
         </html>
         """
+        
+        msg.html = email_html
         mail.send(msg)
         return True
     except Exception as e:
         print(f"Error sending email: {e}")
+        return False
+
+def send_password_reset_email(user_email, reset_code, user_name):
+    try:
+        msg = Message('Woofcare - Password Reset Request', recipients=[user_email])
+        
+        # Create the password reset email HTML
+        email_html = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Woofcare - Password Reset</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+                
+                * {{
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }}
+                
+                body {{
+                    font-family: 'Poppins', sans-serif;
+                    line-height: 1.6;
+                    color: #333;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 20px;
+                }}
+                
+                .email-container {{
+                    max-width: 600px;
+                    width: 100%;
+                    background: white;
+                    border-radius: 20px;
+                    overflow: hidden;
+                    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                }}
+                
+                .header {{
+                    background: linear-gradient(135deg, #8B7355 0%, #a88c6c 50%, #c5a57f 100%);
+                    color: white;
+                    padding: 40px 30px;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden;
+                }}
+                
+                .logo {{
+                    font-size: 2.5rem;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                    display: inline-block;
+                }}
+                
+                .header h1 {{
+                    font-size: 2.2rem;
+                    margin-bottom: 10px;
+                    position: relative;
+                    z-index: 2;
+                }}
+                
+                .header p {{
+                    font-size: 1.1rem;
+                    opacity: 0.9;
+                    position: relative;
+                    z-index: 2;
+                }}
+                
+                .content {{
+                    padding: 40px 30px;
+                    background: #f9f9f9;
+                }}
+                
+                .security-alert {{
+                    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+                    color: white;
+                    padding: 20px;
+                    border-radius: 15px;
+                    margin-bottom: 25px;
+                    text-align: center;
+                }}
+                
+                .security-alert h2 {{
+                    font-size: 1.5rem;
+                    margin-bottom: 10px;
+                }}
+                
+                .user-name {{
+                    font-weight: 600;
+                    color: #FFD700;
+                    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                }}
+                
+                .reset-section {{
+                    text-align: center;
+                    margin: 30px 0;
+                }}
+                
+                .reset-code {{
+                    background: linear-gradient(135deg, #8B7355, #a88c6c);
+                    color: white;
+                    padding: 25px;
+                    font-size: 2.5rem;
+                    font-weight: bold;
+                    text-align: center;
+                    border-radius: 15px;
+                    letter-spacing: 8px;
+                    margin: 25px 0;
+                    box-shadow: 0 10px 20px rgba(139, 115, 85, 0.3);
+                    position: relative;
+                    overflow: hidden;
+                }}
+                
+                .instructions {{
+                    background: white;
+                    padding: 20px;
+                    border-radius: 10px;
+                    margin: 25px 0;
+                    border-left: 4px solid #8B7355;
+                }}
+                
+                .steps {{
+                    display: flex;
+                    justify-content: space-between;
+                    margin: 30px 0;
+                }}
+                
+                .step {{
+                    text-align: center;
+                    flex: 1;
+                    padding: 15px;
+                }}
+                
+                .step-icon {{
+                    width: 60px;
+                    height: 60px;
+                    background: #8B7355;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 auto 15px;
+                    font-size: 1.5rem;
+                }}
+                
+                .step-text {{
+                    font-size: 0.9rem;
+                    color: #666;
+                }}
+                
+                .security-note {{
+                    background: #fff3cd;
+                    border: 1px solid #ffeaa7;
+                    color: #856404;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    text-align: center;
+                }}
+                
+                .urgent-note {{
+                    background: #f8d7da;
+                    border: 1px solid #f5c6cb;
+                    color: #721c24;
+                    padding: 15px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                    text-align: center;
+                }}
+                
+                .footer {{
+                    text-align: center;
+                    margin-top: 40px;
+                    padding-top: 30px;
+                    border-top: 1px solid #ddd;
+                    color: #666;
+                    font-size: 0.9rem;
+                }}
+                
+                .social-links {{
+                    display: flex;
+                    justify-content: center;
+                    gap: 15px;
+                    margin: 20px 0;
+                }}
+                
+                .social-link {{
+                    width: 40px;
+                    height: 40px;
+                    background: #8B7355;
+                    color: white;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-decoration: none;
+                }}
+                
+                .btn {{
+                    display: inline-block;
+                    background: linear-gradient(135deg, #8B7355, #a88c6c);
+                    color: white;
+                    padding: 12px 30px;
+                    text-decoration: none;
+                    border-radius: 25px;
+                    font-weight: 600;
+                    margin: 10px 5px;
+                }}
+                
+                @media (max-width: 768px) {{
+                    .steps {{
+                        flex-direction: column;
+                        gap: 15px;
+                    }}
+                    
+                    .reset-code {{
+                        font-size: 2rem;
+                        letter-spacing: 5px;
+                        padding: 20px;
+                    }}
+                    
+                    .header {{
+                        padding: 30px 20px;
+                    }}
+                    
+                    .content {{
+                        padding: 30px 20px;
+                    }}
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="email-container">
+                <div class="header">
+                    <div class="logo">🐕 Woofcare</div>
+                    <h1>Password Reset Request</h1>
+                    <p>Secure your account and get back to finding your perfect companion</p>
+                </div>
+                
+                <div class="content">
+                    <!-- Security Alert -->
+                    <div class="security-alert">
+                        <h2>Security Alert 🔒</h2>
+                        <p>A password reset was requested for your Woofcare account</p>
+                    </div>
+                    
+                    <h2 style="text-align: center; margin-bottom: 20px; color: #8B7355;">Reset Your Password</h2>
+                    
+                    <p style="text-align: center; margin-bottom: 25px; font-size: 1.1rem;">
+                        Hello <strong>{user_name}</strong>! We received a request to reset your Woofcare account password. 
+                        Use the code below to securely reset your password and regain access to your account.
+                    </p>
+                    
+                    <div class="reset-section">
+                        <p style="margin-bottom: 15px; font-weight: 500;">Your password reset code is:</p>
+                        
+                        <div class="reset-code">
+                            {reset_code}
+                        </div>
+                        
+                        <p style="color: #666; font-size: 0.95rem;">
+                            Enter this code on the password reset page to create a new password
+                        </p>
+                    </div>
+                    
+                    <!-- Steps Instructions -->
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step-icon">1</div>
+                            <div class="step-text">Copy the reset code above</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">2</div>
+                            <div class="step-text">Return to Woofcare reset page</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-icon">3</div>
+                            <div class="step-text">Enter code & create new password</div>
+                        </div>
+                    </div>
+                    
+                    <div class="instructions">
+                        <p style="margin-bottom: 10px;"><strong>Need Help?</strong> If the button above doesn't work, copy and paste the reset code manually.</p>
+                        <p>Make sure to create a strong password that you haven't used before for better security.</p>
+                    </div>
+                    
+                    <div class="urgent-note">
+                        ⚠️ <strong>Important:</strong> If you didn't request this password reset, please ignore this email and 
+                        <a href="mailto:support@woofcare.com" style="color: #721c24; font-weight: bold;">contact our support team immediately</a>.
+                    </div>
+                    
+                    <div class="security-note">
+                        🔒 <strong>Security Notice:</strong> This reset code will expire in <strong>1 hour</strong> for your protection.
+                        For security reasons, please do not share this code with anyone.
+                    </div>
+                    
+                    <p style="text-align: center; margin: 25px 0; color: #666;">
+                        Having trouble? <a href="mailto:support@woofcare.com" style="color: #8B7355;">Contact our support team</a> 
+                        and we'll be happy to help you.
+                    </p>
+                    
+                    <p style="text-align: center; font-size: 1.1rem;">
+                        Stay secure,<br>
+                        <strong>The Woofcare Security Team</strong> 🐶
+                    </p>
+                </div>
+                
+                <div class="footer">
+                    <div class="social-links">
+                        <a href="#" class="social-link">📘</a>
+                        <a href="#" class="social-link">📷</a>
+                        <a href="#" class="social-link">🐦</a>
+                        <a href="#" class="social-link">💼</a>
+                    </div>
+                    <p>&copy; 2025 Woofcare. All rights reserved.</p>
+                    <p>Nairobi, Kenya | <a href="#" style="color: #8B7355;">Privacy Policy</a></p>
+                    <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.7;">
+                        Protecting your account, one paw at a time 🐾
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        msg.html = email_html
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending password reset email: {e}")
         return False
 
 def init_db():
@@ -150,52 +711,253 @@ def init_db():
         db.drop_all()
         db.create_all()
         
-        # Add sample dogs if none exist - WITH CORRECTED IMAGE PATHS
+        # Add 30 sample dogs - one for each breed
         sample_dogs = [
+            # Family-Friendly Breeds
             Dog(
                 name="Max", breed="Labrador Retriever", age=2, 
                 age_category="young", size="large", color="Golden", 
                 energy_level="high", price=25000.0,
-                description="Friendly and energetic Labrador Retriever. Great with families and children.",
-                image_url="/static/images/breeds/Labrador.jpg"  # Corrected path
+                description="Friendly and energetic Labrador Retriever. Great with families and children. Loves playing fetch and swimming.",
+                image_url="/static/images/breeds/Labrador.jpg",
+                is_available=True
             ),
             Dog(
                 name="Bella", breed="German Shepherd", age=3, 
                 age_category="adult", size="large", color="Black and Tan", 
                 energy_level="high", price=30000.0,
-                description="Loyal and intelligent German Shepherd. Excellent guard dog and family companion.",
-                image_url="/static/images/breeds/german-shepherd.jpg"  # Corrected path
+                description="Loyal and intelligent German Shepherd. Excellent guard dog and family companion. Highly trainable and protective.",
+                image_url="/static/images/breeds/german-shepherd.jpg",
+                is_available=True
             ),
-            Dog(
-                name="Charlie", breed="French Bulldog", age=1, 
-                age_category="puppy", size="small", color="Brindle", 
-                energy_level="medium", price=45000.0,
-                description="Playful and affectionate French Bulldog. Perfect for apartment living.",
-                image_url="/static/images/breeds/french-bulldog.jpg"  # Corrected path
-            ),
-            # Add more sample dogs for better variety
             Dog(
                 name="Luna", breed="Golden Retriever", age=1, 
                 age_category="puppy", size="large", color="Cream", 
                 energy_level="high", price=35000.0,
-                description="Sweet and intelligent Golden Retriever puppy. Loves to play and learn new tricks.",
-                image_url="/static/images/breeds/Golden_Retriever.jpg"
+                description="Sweet and intelligent Golden Retriever puppy. Loves to play and learn new tricks. Great with kids.",
+                image_url="/static/images/breeds/Golden_Retriever.jpg",
+                is_available=True
             ),
             Dog(
                 name="Rocky", breed="Beagle", age=2, 
                 age_category="young", size="medium", color="Tri-color", 
                 energy_level="medium", price=22000.0,
-                description="Curious and friendly Beagle with a great sense of smell. Perfect for active families.",
-                image_url="/static/images/breeds/beagle.jpg"
+                description="Curious and friendly Beagle with a great sense of smell. Perfect for active families and outdoor adventures.",
+                image_url="/static/images/breeds/beagle.jpg",
+                is_available=True
             ),
             Dog(
                 name="Daisy", breed="Poodle", age=4, 
                 age_category="adult", size="medium", color="White", 
                 energy_level="medium", price=28000.0,
-                description="Elegant and intelligent Poodle. Hypoallergenic and great for families with allergies.",
-                image_url="/static/images/breeds/poodle.jpg"
+                description="Elegant and intelligent Poodle. Hypoallergenic and great for families with allergies. Very trainable.",
+                image_url="/static/images/breeds/poodle.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Bruno", breed="Rottweiler", age=2, 
+                age_category="young", size="large", color="Black and Tan", 
+                energy_level="high", price=32000.0,
+                description="Confident and courageous Rottweiler. Excellent guard dog with a loyal and protective nature.",
+                image_url="/static/images/breeds/rottweiler.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Coco", breed="Yorkshire Terrier", age=1, 
+                age_category="puppy", size="small", color="Blue and Tan", 
+                energy_level="medium", price=25000.0,
+                description="Small but brave Yorkshire Terrier with a big personality. Perfect for apartment living.",
+                image_url="/static/images/breeds/yorkie.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Oscar", breed="Dachshund", age=3, 
+                age_category="adult", size="small", color="Red", 
+                energy_level="medium", price=20000.0,
+                description="Curious and spunky Dachshund with a long body and big personality. Great for families.",
+                image_url="/static/images/breeds/dachshund.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Zeus", breed="Boxer", age=2, 
+                age_category="young", size="large", color="Fawn", 
+                energy_level="high", price=28000.0,
+                description="Playful and energetic Boxer. Great with children and makes an excellent family companion.",
+                image_url="/static/images/breeds/boxer.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Lola", breed="Siberian Husky", age=2, 
+                age_category="young", size="large", color="Gray and White", 
+                energy_level="high", price=30000.0,
+                description="Beautiful Husky with striking blue eyes. Energetic and loves cold weather. Great for active families.",
+                image_url="/static/images/breeds/siberian-husky.jpg",
+                is_available=True
+            ),
+            # Small & Companion Breeds
+            Dog(
+                name="Peanut", breed="Chihuahua", age=1, 
+                age_category="puppy", size="small", color="Tan", 
+                energy_level="medium", price=18000.0,
+                description="Tiny Chihuahua with a huge personality. Loyal companion perfect for city living.",
+                image_url="/static/images/breeds/chihuahua.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Duke", breed="Doberman Pinscher", age=2, 
+                age_category="young", size="large", color="Black and Rust", 
+                energy_level="high", price=35000.0,
+                description="Athletic and intelligent Doberman. Excellent guard dog with unwavering loyalty to family.",
+                image_url="/static/images/breeds/doberman.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Titan", breed="Great Dane", age=1, 
+                age_category="puppy", size="large", color="Harlequin", 
+                energy_level="medium", price=40000.0,
+                description="Gentle giant Great Dane puppy. Despite their size, they are gentle and great with families.",
+                image_url="/static/images/breeds/great-dane.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Milo", breed="Shih Tzu", age=2, 
+                age_category="young", size="small", color="White and Gold", 
+                energy_level="low", price=22000.0,
+                description="Affectionate and outgoing Shih Tzu. Perfect lap dog with a charming personality.",
+                image_url="/static/images/breeds/shih-tzu.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Cooper", breed="Border Collie", age=2, 
+                age_category="young", size="medium", color="Black and White", 
+                energy_level="high", price=28000.0,
+                description="Highly intelligent Border Collie. The world's smartest dog breed, perfect for active owners.",
+                image_url="/static/images/breeds/border-collie.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Ruby", breed="Australian Shepherd", age=1, 
+                age_category="puppy", size="medium", color="Blue Merle", 
+                energy_level="high", price=32000.0,
+                description="Beautiful Australian Shepherd with stunning merle coat. Intelligent and energetic working dog.",
+                image_url="/static/images/breeds/australian-shepherd.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Buddy", breed="Pug", age=3, 
+                age_category="adult", size="small", color="Fawn", 
+                energy_level="low", price=24000.0,
+                description="Charming and mischievous Pug. 'Multum in parvo' - a lot of dog in a small space with big personality.",
+                image_url="/static/images/breeds/pug.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Sophie", breed="Cocker Spaniel", age=2, 
+                age_category="young", size="medium", color="Golden", 
+                energy_level="medium", price=24000.0,
+                description="Beautiful sporting dog with silky coat and sweet disposition. Great family companion.",
+                image_url="/static/images/breeds/cocker-spaniel.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Snowball", breed="Maltese", age=1, 
+                age_category="puppy", size="small", color="White", 
+                energy_level="low", price=26000.0,
+                description="Elegant and gentle Maltese. Perfect lap dog with a sweet and charming personality.",
+                image_url="/static/images/breeds/maltese.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Gizmo", breed="French Bulldog", age=1, 
+                age_category="puppy", size="small", color="Brindle", 
+                energy_level="medium", price=45000.0,
+                description="Playful and affectionate French Bulldog. Perfect for apartment living with their charming bat ears.",
+                image_url="/static/images/breeds/french-bulldog.jpg",
+                is_available=True
+            ),
+            # Working & Guardian Breeds
+            Dog(
+                name="Bear", breed="Saint Bernard", age=2, 
+                age_category="young", size="large", color="Red and White", 
+                energy_level="low", price=38000.0,
+                description="Gentle giant Saint Bernard. Famous rescue dog known for massive size and gentle nature.",
+                image_url="/static/images/breeds/saint-bernard.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Mountain", breed="Bernese Mountain Dog", age=1, 
+                age_category="puppy", size="large", color="Tri-color", 
+                energy_level="medium", price=42000.0,
+                description="Beautiful tri-colored working dog from Swiss Alps. Calm and good-natured family companion.",
+                image_url="/static/images/breeds/bernese-mountain.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Flash", breed="Greyhound", age=3, 
+                age_category="adult", size="large", color="Fawn", 
+                energy_level="low", price=27000.0,
+                description="The world's fastest couch potato. Surprisingly low energy indoors despite racing background.",
+                image_url="/static/images/breeds/greyhound.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Cotton", breed="Bichon Frisé", age=2, 
+                age_category="young", size="small", color="White", 
+                energy_level="medium", price=23000.0,
+                description="Fluffy white companion known for happy-go-lucky attitude. Hypoallergenic and great for allergies.",
+                image_url="/static/images/breeds/bichon.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Kuma", breed="Akita", age=2, 
+                age_category="young", size="large", color="White", 
+                energy_level="medium", price=35000.0,
+                description="Majestic Japanese guardian known for unwavering loyalty. Dignified and profoundly loyal companion.",
+                image_url="/static/images/breeds/akita.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Blue", breed="Pit Bull Terrier", age=2, 
+                age_category="young", size="medium", color="Blue", 
+                energy_level="high", price=22000.0,
+                description="Misunderstood companion with incredible loyalty and affection. Strong and confident family dog.",
+                image_url="/static/images/breeds/pitbull.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Spot", breed="Dalmatian", age=1, 
+                age_category="puppy", size="large", color="White with Black Spots", 
+                energy_level="high", price=26000.0,
+                description="Iconic spotted dog known for endurance and unique appearance. Energetic and smart companion.",
+                image_url="/static/images/breeds/dalmatian.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Shelly", breed="Shetland Sheepdog", age=2, 
+                age_category="young", size="small", color="Sable and White", 
+                energy_level="high", price=26000.0,
+                description="Miniature collie with big heart and exceptional intelligence. Lively and highly trainable.",
+                image_url="/static/images/breeds/shetland-sheepdog.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Rusty", breed="Irish Setter", age=1, 
+                age_category="puppy", size="large", color="Mahogany", 
+                energy_level="high", price=29000.0,
+                description="Beautiful red-coated hunter with endless energy and charm. Perfect for active families.",
+                image_url="/static/images/breeds/irish-setter.jpg",
+                is_available=True
+            ),
+            Dog(
+                name="Winston", breed="Bulldog", age=4, 
+                age_category="adult", size="medium", color="Brindle", 
+                energy_level="low", price=35000.0,
+                description="Calm and courageous Bulldog. Gentle and low-energy companion perfect for relaxed households.",
+                image_url="/static/images/breeds/bulldog.jpg",
+                is_available=True
             )
         ]
+        
         for dog in sample_dogs:
             db.session.add(dog)
         
@@ -224,12 +986,14 @@ def init_db():
         db.session.add(test_user)
         
         db.session.commit()
-        print("Database initialized successfully with corrected image paths!")
+        print("Database initialized successfully with 30 dogs!")
 
-# Routes
+# ==================== ROUTES ====================
+
 @app.route('/')
 def index():
-    dogs = Dog.query.filter_by(is_available=True).limit(6).all()
+    # Show 30 dogs on homepage (all available dogs)
+    dogs = Dog.query.filter_by(is_available=True).limit(30).all()
     return render_template('index.html', dogs=dogs)
 
 @app.route('/dogs')
@@ -259,7 +1023,6 @@ def dogs():
 @app.route('/dog/<int:dog_id>')
 def dog_detail(dog_id):
     dog = Dog.query.get_or_404(dog_id)
-    # Get similar dogs (same breed or same size)
     similar_dogs = Dog.query.filter(
         Dog.id != dog.id,
         Dog.is_available == True
@@ -283,6 +1046,7 @@ def register():
             return redirect(url_for('register'))
         
         verification_code = str(random.randint(100000, 999999))
+        user_name = f"{first_name} {last_name}"
         
         user = User(
             email=email,
@@ -296,7 +1060,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        if send_verification_email(email, verification_code):
+        if send_verification_email(email, verification_code, user_name):
             flash('Verification code sent to your email', 'success')
         else:
             flash('Error sending verification email', 'error')
@@ -336,7 +1100,8 @@ def resend_verification():
         user.verification_code = verification_code
         db.session.commit()
         
-        if send_verification_email(email, verification_code):
+        user_name = f"{user.first_name} {user.last_name}"
+        if send_verification_email(email, verification_code, user_name):
             flash('Verification code resent to your email', 'success')
         else:
             flash('Error sending verification email', 'error')
@@ -352,29 +1117,18 @@ def login():
         password = request.form['password']
         remember_me = 'remember_me' in request.form
         
-        print(f"🔐 Login attempt for: {email}")
-        
         user = User.query.filter_by(email=email).first()
         
-        if user:
-            print(f"✅ User found: {user.email}, verified: {user.is_verified}")
-            if user.check_password(password):
-                print("✅ Password correct")
-                if user.is_verified:
-                    login_user(user, remember=remember_me)
-                    print(f"🎉 User logged in successfully. Authenticated: {current_user.is_authenticated}")
-                    flash('Logged in successfully!', 'success')
-                    next_page = request.args.get('next')
-                    return redirect(next_page or url_for('index'))
-                else:
-                    print("❌ User not verified")
-                    flash('Please verify your email first. Check your email for the verification code.', 'error')
-                    return redirect(url_for('verify_email', email=email))
+        if user and user.check_password(password):
+            if user.is_verified:
+                login_user(user, remember=remember_me)
+                flash('Logged in successfully!', 'success')
+                next_page = request.args.get('next')
+                return redirect(next_page or url_for('index'))
             else:
-                print("❌ Password incorrect")
-                flash('Invalid email or password', 'error')
+                flash('Please verify your email first. Check your email for the verification code.', 'error')
+                return redirect(url_for('verify_email', email=email))
         else:
-            print("❌ User not found")
             flash('Invalid email or password', 'error')
     
     return render_template('login.html')
@@ -390,15 +1144,11 @@ def forgot_password():
             user.verification_code = reset_code
             db.session.commit()
             
-            # Send reset code via email
-            try:
-                msg = Message('Woofcare - Password Reset',
-                            recipients=[email])
-                msg.body = f'Your password reset code is: {reset_code}'
-                mail.send(msg)
-                flash('Reset code sent to your email', 'success')
+            user_name = f"{user.first_name} {user.last_name}"
+            if send_password_reset_email(email, reset_code, user_name):
+                flash('Password reset code sent to your email', 'success')
                 return redirect(url_for('reset_password', email=email))
-            except Exception as e:
+            else:
                 flash('Error sending reset code', 'error')
         else:
             flash('Email not found', 'error')
@@ -435,7 +1185,6 @@ def checkout(dog_id):
     if request.method == 'POST':
         mpesa_number = request.form['mpesa_number']
         
-        # Initialize payment with IntaSend
         order = Order(
             user_id=current_user.id,
             dog_id=dog.id,
@@ -445,44 +1194,8 @@ def checkout(dog_id):
         db.session.add(order)
         db.session.commit()
         
-        # IntaSend payment integration
-        intasend_api_key = "YOUR_INTASEND_API_KEY"
-        headers = {
-            "Authorization": f"Bearer {intasend_api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "public_key": "ISPubKey_test_",
-            "amount": dog.price,
-            "currency": "KES",
-            "phone_number": mpesa_number,
-            "email": current_user.email,
-            "first_name": current_user.first_name,
-            "last_name": current_user.last_name,
-            "order_id": order.id
-        }
-        
-        try:
-            response = requests.post(
-                "https://payment.intasend.com/api/v1/payment/mpesa-stk-push/",
-                headers=headers,
-                json=payload
-            )
-            
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('success'):
-                    order.transaction_id = data.get('invoice', {}).get('transaction_id')
-                    db.session.commit()
-                    flash('Payment initiated. Check your phone to complete payment.', 'success')
-                    return redirect(url_for('order_confirmation', order_id=order.id))
-                else:
-                    flash('Payment initiation failed', 'error')
-            else:
-                flash('Payment service unavailable', 'error')
-        except Exception as e:
-            flash('Payment service error', 'error')
+        flash('Order created successfully!', 'success')
+        return redirect(url_for('order_confirmation', order_id=order.id))
     
     return render_template('checkout.html', dog=dog)
 
@@ -503,15 +1216,12 @@ def logout():
 @app.route('/account')
 @login_required
 def account():
-    # Get user's orders
     orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
     
-    # Calculate user statistics
     total_orders = len(orders)
     completed_orders = len([order for order in orders if order.status == 'completed'])
     total_spent = sum(order.amount for order in orders if order.status == 'completed')
     
-    # For now, return empty wishlist until we implement it
     wishlist_dogs = []
     wishlist_count = 0
     
@@ -530,7 +1240,6 @@ def update_profile():
     current_user.last_name = request.form['last_name']
     current_user.phone = request.form['phone']
     
-    # Handle profile picture upload
     if 'profile_picture' in request.files:
         file = request.files['profile_picture']
         if file and file.filename != '' and allowed_file(file.filename):
@@ -567,7 +1276,8 @@ def change_password():
     flash('Password changed successfully!', 'success')
     return redirect(url_for('account'))
 
-# Admin routes
+# ==================== ADMIN ROUTES ====================
+
 @app.route('/admin')
 @login_required
 def admin_dashboard():
@@ -578,19 +1288,22 @@ def admin_dashboard():
     total_dogs = Dog.query.count()
     total_orders = Order.query.count()
     total_users = User.query.count()
+    pending_orders = Order.query.filter_by(status='pending').count()
     
-    # Calculate total revenue
     completed_orders = Order.query.filter_by(status='completed').all()
     total_revenue = sum(order.amount for order in completed_orders)
     
     recent_orders = Order.query.order_by(Order.created_at.desc()).limit(5).all()
+    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
     
     return render_template('admin/dashboard.html',
                          total_dogs=total_dogs,
                          total_orders=total_orders,
                          total_users=total_users,
+                         pending_orders=pending_orders,
                          total_revenue=total_revenue,
-                         recent_orders=recent_orders)
+                         recent_orders=recent_orders,
+                         recent_users=recent_users)
 
 @app.route('/admin/dogs')
 @login_required
@@ -609,10 +1322,163 @@ def admin_orders():
         flash('Access denied', 'error')
         return redirect(url_for('index'))
     
-    orders = Order.query.all()
-    return render_template('admin/orders.html', orders=orders)
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    
+    # Calculate financial metrics
+    total_orders = len(orders)
+    completed_orders = [o for o in orders if o.status == 'completed']
+    pending_orders = [o for o in orders if o.status == 'pending']
+    
+    # Calculate totals safely (handle None values)
+    total_revenue = sum(order.amount for order in completed_orders if order.amount) or 0
+    total_orders_value = sum(order.amount for order in orders if order.amount) or 0
+    completed_orders_value = sum(order.amount for order in completed_orders if order.amount) or 0
+    pending_orders_value = sum(order.amount for order in pending_orders if order.amount) or 0
+    
+    # Count M-Pesa orders
+    mpesa_orders = total_orders
+    
+    # Get user statistics
+    total_users = User.query.count()
+    
+    # Simulate visitor analytics
+    visitor_count = random.randint(500, 1000)
+    
+    return render_template('admin/orders.html',
+                         orders=orders,
+                         total_orders=total_orders,
+                         total_revenue=total_revenue,
+                         mpesa_orders=mpesa_orders,
+                         pending_orders=len(pending_orders),
+                         total_users=total_users,
+                         visitor_count=visitor_count,
+                         total_orders_value=total_orders_value,
+                         completed_orders_count=len(completed_orders),
+                         completed_orders_value=completed_orders_value,
+                         pending_orders_count=len(pending_orders),
+                         pending_orders_value=pending_orders_value)
 
-# Debug routes
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if not current_user.is_admin:
+        flash('Access denied', 'error')
+        return redirect(url_for('index'))
+    
+    users = User.query.order_by(User.created_at.desc()).all()
+    return render_template('admin/users.html', users=users)
+
+@app.route('/admin/dog/<int:dog_id>/toggle', methods=['POST'])
+@login_required
+def toggle_dog_availability(dog_id):
+    if not current_user.is_admin:
+        flash('Access denied', 'error')
+        return redirect(url_for('index'))
+    
+    dog = Dog.query.get_or_404(dog_id)
+    dog.is_available = not dog.is_available
+    db.session.commit()
+    
+    status = "available" if dog.is_available else "unavailable"
+    flash(f'Dog {dog.name} is now {status}', 'success')
+    return redirect(url_for('admin_dogs'))
+
+@app.route('/admin/order/<order_id>/update', methods=['POST'])
+@login_required
+def update_order_status(order_id):
+    if not current_user.is_admin:
+        flash('Access denied', 'error')
+        return redirect(url_for('index'))
+    
+    order = Order.query.get_or_404(order_id)
+    new_status = request.form.get('status')
+    
+    if new_status in ['pending', 'completed', 'failed']:
+        order.status = new_status
+        db.session.commit()
+        flash(f'Order status updated to {new_status}', 'success')
+    
+    return redirect(url_for('admin_orders'))
+
+@app.route('/admin/user/<int:user_id>/toggle', methods=['POST'])
+@login_required
+def toggle_user_status(user_id):
+    if not current_user.is_admin:
+        flash('Access denied', 'error')
+        return redirect(url_for('index'))
+    
+    user = User.query.get_or_404(user_id)
+    
+    if user.id == current_user.id:
+        flash('You cannot deactivate your own account', 'error')
+        return redirect(url_for('admin_users'))
+    
+    user.is_verified = not user.is_verified
+    db.session.commit()
+    
+    status = "activated" if user.is_verified else "deactivated"
+    flash(f'User {user.email} has been {status}', 'success')
+    return redirect(url_for('admin_users'))
+
+@app.route('/admin/add-dog', methods=['GET', 'POST'])
+@login_required
+def add_dog():
+    if not current_user.is_admin:
+        flash('Access denied', 'error')
+        return redirect(url_for('index'))
+    
+    if request.method == 'POST':
+        name = request.form['name']
+        breed = request.form['breed']
+        age = int(request.form['age'])
+        size = request.form['size']
+        color = request.form['color']
+        energy_level = request.form['energy_level']
+        price = float(request.form['price'])
+        description = request.form['description']
+        
+        if age <= 1:
+            age_category = 'puppy'
+        elif age <= 3:
+            age_category = 'young'
+        elif age <= 7:
+            age_category = 'adult'
+        else:
+            age_category = 'senior'
+        
+        image_url = None
+        if 'image' in request.files:
+            file = request.files['image']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = secure_filename(f"dog_{name}_{datetime.now().strftime('%Y%m%d%H%M%S')}_{file.filename}")
+                file_path = os.path.join('static/uploads/dogs', filename)
+                os.makedirs('static/uploads/dogs', exist_ok=True)
+                file.save(file_path)
+                image_url = f"/static/uploads/dogs/{filename}"
+        
+        dog = Dog(
+            name=name,
+            breed=breed,
+            age=age,
+            age_category=age_category,
+            size=size,
+            color=color,
+            energy_level=energy_level,
+            price=price,
+            description=description,
+            image_url=image_url,
+            is_available=True
+        )
+        
+        db.session.add(dog)
+        db.session.commit()
+        flash('Dog added successfully!', 'success')
+        return redirect(url_for('admin_dogs'))
+    
+    return render_template('admin/add_dog.html', breeds=DOG_BREEDS)
+
+# ==================== DEBUG ROUTES ====================
+
 @app.route('/debug/users')
 def debug_users():
     users = User.query.all()
@@ -651,276 +1517,54 @@ def debug_current_user():
     else:
         return jsonify({'authenticated': False})
 
-# Test route to check if images are loading
+@app.route('/debug/routes')
+def debug_routes():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'path': str(rule)
+        })
+    return jsonify(routes)
+
 @app.route('/test-images')
 def test_images():
-    """Test if images are loading correctly"""
     breeds = [
         'Labrador.jpg', 'german-shepherd.jpg', 'french-bulldog.jpg',
         'Golden_Retriever.jpg', 'beagle.jpg', 'bulldog.jpg', 'poodle.jpg'
     ]
     return render_template('test_images.html', breeds=breeds)
 
+# API endpoint for order details (for the modal)
+@app.route('/api/order/<order_id>')
+@login_required
+def get_order_details(order_id):
+    if not current_user.is_admin:
+        return jsonify({'error': 'Access denied'}), 403
+    
+    order = Order.query.get_or_404(order_id)
+    
+    return jsonify({
+        'id': order.id,
+        'user': {
+            'first_name': order.user.first_name,
+            'last_name': order.user.last_name,
+            'email': order.user.email,
+            'phone': order.user.phone
+        },
+        'dog': {
+            'name': order.dog.name,
+            'breed': order.dog.breed,
+            'price': order.dog.price
+        },
+        'amount': order.amount,
+        'mpesa_number': order.mpesa_number,
+        'status': order.status,
+        'transaction_id': order.transaction_id,
+        'created_at': order.created_at.isoformat()
+    })
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
-def init_db():
-    with app.app_context():
-        # Drop all tables and recreate them (for development only)
-        db.drop_all()
-        db.create_all()
-        
-        # Add 30+ sample dogs covering all breeds
-        sample_dogs = [
-            # Family-Friendly Breeds (5 dogs)
-            Dog(
-                name="Max", breed="Labrador Retriever", age=2, 
-                age_category="young", size="large", color="Golden", 
-                energy_level="high", price=25000.0,
-                description="Friendly and energetic Labrador Retriever. Great with families and children.",
-                image_url="/static/images/breeds/Labrador.jpg"
-            ),
-            Dog(
-                name="Luna", breed="Golden Retriever", age=1, 
-                age_category="puppy", size="large", color="Cream", 
-                energy_level="high", price=35000.0,
-                description="Sweet and intelligent Golden Retriever puppy. Loves to play and learn new tricks.",
-                image_url="/static/images/breeds/Golden_Retriever.jpg"
-            ),
-            Dog(
-                name="Buddy", breed="Beagle", age=2, 
-                age_category="young", size="medium", color="Tri-color", 
-                energy_level="medium", price=22000.0,
-                description="Curious and friendly Beagle with a great sense of smell. Perfect for active families.",
-                image_url="/static/images/breeds/beagle.jpg"
-            ),
-            Dog(
-                name="Duke", breed="Bulldog", age=4, 
-                age_category="adult", size="medium", color="Brindle", 
-                energy_level="low", price=35000.0,
-                description="Gentle and low-energy Bulldog. Great companion for relaxed households.",
-                image_url="/static/images/breeds/bulldog.jpg"
-            ),
-            Dog(
-                name="Daisy", breed="Poodle", age=3, 
-                age_category="adult", size="medium", color="White", 
-                energy_level="medium", price=28000.0,
-                description="Elegant and intelligent Poodle. Hypoallergenic and great for families with allergies.",
-                image_url="/static/images/breeds/poodle.jpg"
-            ),
-
-            # Working & Guardian Breeds (5 dogs)
-            Dog(
-                name="Bella", breed="German Shepherd", age=3, 
-                age_category="adult", size="large", color="Black and Tan", 
-                energy_level="high", price=30000.0,
-                description="Loyal and intelligent German Shepherd. Excellent guard dog and family companion.",
-                image_url="/static/images/breeds/german-shepherd.jpg"
-            ),
-            Dog(
-                name="Rocky", breed="Rottweiler", age=2, 
-                age_category="young", size="large", color="Black and Mahogany", 
-                energy_level="medium", price=32000.0,
-                description="Confident and loyal Rottweiler. Natural protector with a gentle heart.",
-                image_url="/static/images/breeds/rottweiler.jpg"
-            ),
-            Dog(
-                name="Zeus", breed="Doberman Pinscher", age=4, 
-                age_category="adult", size="large", color="Black and Rust", 
-                energy_level="high", price=35000.0,
-                description="Athletic and intelligent Doberman. Excellent working dog and loyal companion.",
-                image_url="/static/images/breeds/doberman.jpg"
-            ),
-            Dog(
-                name="Tyson", breed="Boxer", age=1, 
-                age_category="puppy", size="large", color="Fawn", 
-                energy_level="high", price=28000.0,
-                description="Playful and energetic Boxer puppy. Loves to play and has a wonderful temperament.",
-                image_url="/static/images/breeds/boxer.jpg"
-            ),
-            Dog(
-                name="Apollo", breed="Great Dane", age=2, 
-                age_category="young", size="large", color="Harlequin", 
-                energy_level="medium", price=40000.0,
-                description="Gentle giant with a sweet disposition. Majestic and family-friendly.",
-                image_url="/static/images/breeds/great-dane.jpg"
-            ),
-
-            # Small & Companion Breeds (5 dogs)
-            Dog(
-                name="Charlie", breed="French Bulldog", age=1, 
-                age_category="puppy", size="small", color="Brindle", 
-                energy_level="medium", price=45000.0,
-                description="Playful and affectionate French Bulldog. Perfect for apartment living.",
-                image_url="/static/images/breeds/french-bulldog.jpg"
-            ),
-            Dog(
-                name="Coco", breed="Yorkshire Terrier", age=1, 
-                age_category="puppy", size="small", color="Black and Tan", 
-                energy_level="medium", price=25000.0,
-                description="Adorable Yorkshire Terrier with big personality. Perfect lap dog.",
-                image_url="/static/images/breeds/yorkie.jpg"
-            ),
-            Dog(
-                name="Peanut", breed="Chihuahua", age=2, 
-                age_category="young", size="small", color="Fawn", 
-                energy_level="medium", price=18000.0,
-                description="Tiny Chihuahua with huge personality. Loyal and affectionate companion.",
-                image_url="/static/images/breeds/chihuahua.jpg"
-            ),
-            Dog(
-                name="Mimi", breed="Shih Tzu", age=3, 
-                age_category="adult", size="small", color="White and Gold", 
-                energy_level="low", price=22000.0,
-                description="Charming Shih Tzu with a sweet nature. Great companion for all ages.",
-                image_url="/static/images/breeds/shih-tzu.jpg"
-            ),
-            Dog(
-                name="Snowball", breed="Maltese", age=2, 
-                age_category="young", size="small", color="White", 
-                energy_level="low", price=26000.0,
-                description="Elegant Maltese with a gentle disposition. Perfect for city living.",
-                image_url="/static/images/breeds/maltese.jpg"
-            ),
-
-            # Active & Herding Breeds (5 dogs)
-            Dog(
-                name="Rex", breed="Border Collie", age=2, 
-                age_category="young", size="medium", color="Black and White", 
-                energy_level="high", price=28000.0,
-                description="Highly intelligent Border Collie. Needs active owners and mental stimulation.",
-                image_url="/static/images/breeds/border-collie.jpg"
-            ),
-            Dog(
-                name="Aussie", breed="Australian Shepherd", age=1, 
-                age_category="puppy", size="medium", color="Blue Merle", 
-                energy_level="high", price=32000.0,
-                description="Beautiful Australian Shepherd puppy. Smart and eager to please.",
-                image_url="/static/images/breeds/australian-shepherd.jpg"
-            ),
-            Dog(
-                name="Blizzard", breed="Siberian Husky", age=3, 
-                age_category="adult", size="large", color="Gray and White", 
-                energy_level="high", price=30000.0,
-                description="Stunning Siberian Husky with blue eyes. Energetic and friendly.",
-                image_url="/static/images/breeds/siberian-husky.jpg"
-            ),
-            Dog(
-                name="Shelly", breed="Shetland Sheepdog", age=2, 
-                age_category="young", size="small", color="Sable and White", 
-                energy_level="high", price=26000.0,
-                description="Intelligent Shetland Sheepdog. Miniature collie with big heart.",
-                image_url="/static/images/breeds/shetland-sheepdog.jpg"
-            ),
-            Dog(
-                name="Ruby", breed="Irish Setter", age=1, 
-                age_category="puppy", size="large", color="Mahogany", 
-                energy_level="high", price=29000.0,
-                description="Beautiful Irish Setter puppy. Energetic and outgoing personality.",
-                image_url="/static/images/breeds/irish-setter.jpg"
-            ),
-
-            # Unique & Special Breeds (5 dogs)
-            Dog(
-                name="Winston", breed="Dachshund", age=3, 
-                age_category="adult", size="small", color="Red", 
-                energy_level="medium", price=20000.0,
-                description="Curious Dachshund with long body and big personality. Great family dog.",
-                image_url="/static/images/breeds/dachshund.jpg"
-            ),
-            Dog(
-                name="Bailey", breed="Cocker Spaniel", age=2, 
-                age_category="young", size="medium", color="Golden", 
-                energy_level="medium", price=24000.0,
-                description="Beautiful Cocker Spaniel with silky coat. Gentle and loving companion.",
-                image_url="/static/images/breeds/cocker-spaniel.jpg"
-            ),
-            Dog(
-                name="Bernard", breed="Saint Bernard", age=4, 
-                age_category="adult", size="large", color="Red and White", 
-                energy_level="low", price=38000.0,
-                description="Gentle giant Saint Bernard. Famous rescue dog with sweet nature.",
-                image_url="/static/images/breeds/saint-bernard.jpg"
-            ),
-            Dog(
-                name="Mountain", breed="Bernese Mountain Dog", age=2, 
-                age_category="young", size="large", color="Tri-color", 
-                energy_level="medium", price=42000.0,
-                description="Beautiful Bernese Mountain Dog. Calm and great with families.",
-                image_url="/static/images/breeds/bernese-mountain.jpg"
-            ),
-            Dog(
-                name="Speedy", breed="Greyhound", age=3, 
-                age_category="adult", size="large", color="Fawn", 
-                energy_level="low", price=27000.0,
-                description="Surprisingly low-energy Greyhound. Fastest couch potato you'll meet.",
-                image_url="/static/images/breeds/greyhound.jpg"
-            ),
-
-            # More Wonderful Breeds (5 dogs)
-            Dog(
-                name="Fluffy", breed="Bichon Frisé", age=1, 
-                age_category="puppy", size="small", color="White", 
-                energy_level="medium", price=23000.0,
-                description="Cheerful Bichon Frisé puppy. Hypoallergenic and great for families.",
-                image_url="/static/images/breeds/bichon.jpg"
-            ),
-            Dog(
-                name="Kuma", breed="Akita", age=3, 
-                age_category="adult", size="large", color="White", 
-                energy_level="medium", price=35000.0,
-                description="Majestic Akita with profound loyalty. Dignified and courageous companion.",
-                image_url="/static/images/breeds/akita.jpg"
-            ),
-            Dog(
-                name="Tank", breed="Pit Bull Terrier", age=2, 
-                age_category="young", size="medium", color="Blue", 
-                energy_level="high", price=22000.0,
-                description="Misunderstood Pit Bull with incredible loyalty. Affectionate family dog.",
-                image_url="/static/images/breeds/pitbull.jpg"
-            ),
-            Dog(
-                name="Spot", breed="Dalmatian", age=1, 
-                age_category="puppy", size="large", color="White with Black Spots", 
-                energy_level="high", price=26000.0,
-                description="Iconic Dalmatian puppy. Energetic and intelligent with unique appearance.",
-                image_url="/static/images/breeds/dalmatian.jpg"
-            ),
-            Dog(
-                name="Pugsley", breed="Pug", age=2, 
-                age_category="young", size="small", color="Fawn", 
-                energy_level="low", price=24000.0,
-                description="Charming Pug with wonderful personality. Great companion for any home.",
-                image_url="/static/images/breeds/pug.jpg"
-            )
-        ]
-        
-        for dog in sample_dogs:
-            db.session.add(dog)
-        
-        # Create a test admin user
-        admin_user = User(
-            email="admin@woofcare.com",
-            first_name="Admin",
-            last_name="User",
-            phone="254700000000",
-            is_verified=True,
-            is_admin=True
-        )
-        admin_user.set_password("admin123")
-        db.session.add(admin_user)
-        
-        # Create a test regular user
-        test_user = User(
-            email="test@woofcare.com",
-            first_name="Test",
-            last_name="User",
-            phone="254711111111",
-            is_verified=True,
-            is_admin=False
-        )
-        test_user.set_password("test123")
-        db.session.add(test_user)
-        
-        db.session.commit()
-        print("Database initialized successfully with 30+ dogs!")

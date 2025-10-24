@@ -1,127 +1,1161 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <div style="max-width: 800px; margin: 0 auto;">
-        <h1 style="text-align: center; margin-bottom: 2rem;">Complete Your Adoption</h1>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
-            <!-- Order Summary -->
-            <div>
-                <div class="form-container">
-                    <h3>Order Summary</h3>
-                    
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
-                        <div class="dog-image" style="width: 100px; height: 100px; border-radius: 8px; overflow: hidden;">
-                            {% if dog.image_url %}
-                            <img src="{{ dog.image_url }}" alt="{{ dog.name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                            {% else %}
-                            <div style="width: 100%; height: 100%; background: var(--secondary-color); display: flex; align-items: center; justify-content: center;">
-                                <span style="font-size: 2rem;">🐕</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div>
-                            <h4 style="margin-bottom: 0.5rem;">{{ dog.name }}</h4>
-                            <p style="color: #666; margin-bottom: 0.5rem;">{{ dog.breed }}</p>
-                            <p style="color: #666;">{{ dog.age }} year{{ 's' if dog.age != 1 }} old • {{ dog.size }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="payment-summary">
-                        <div class="summary-item">
-                            <span>Dog Price:</span>
-                            <span>KES {{ "{:,.0f}".format(dog.price) }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span>Delivery Fee:</span>
-                            <span>KES 0</span>
-                        </div>
-                        <div class="summary-item">
-                            <span>Tax:</span>
-                            <span>KES 0</span>
-                        </div>
-                        <div class="summary-item" style="border-bottom: none; font-weight: bold;">
-                            <span>Total Amount:</span>
-                            <span>KES {{ "{:,.0f}".format(dog.price) }}</span>
-                        </div>
-                    </div>
+<div class="checkout-container">
+    <div class="container">
+        <!-- Progress Steps -->
+        <div class="checkout-progress">
+            <div class="progress-steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Adoption Details</div>
                 </div>
-                
-                <!-- Adoption Information -->
-                <div class="form-container" style="margin-top: 1.5rem;">
-                    <h3>Adoption Process</h3>
-                    <ol style="padding-left: 1.5rem; line-height: 1.6;">
-                        <li>Complete M-Pesa payment</li>
-                        <li>Receive payment confirmation</li>
-                        <li>Schedule pickup/delivery</li>
-                        <li>Sign adoption agreement</li>
-                        <li>Welcome your new companion!</li>
-                    </ol>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Payment</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Confirmation</div>
                 </div>
             </div>
-            
-            <!-- Payment Form -->
-            <div>
-                <div class="form-container">
-                    <h3>Payment Details</h3>
-                    
-                    <div class="mpesa-note">
-                        <p>💡 <strong>M-Pesa Payment Instructions:</strong></p>
-                        <p>1. Enter your M-Pesa registered phone number</p>
-                        <p>2. Click "Pay with M-Pesa"</p>
-                        <p>3. Check your phone for STK push prompt</p>
-                        <p>4. Enter your M-Pesa PIN to complete payment</p>
+        </div>
+
+        <div class="checkout-grid">
+            <!-- Left Column - Order Summary & Process -->
+            <div class="checkout-left">
+                <!-- Dog Information Card -->
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h2>🐕 Meet Your New Companion</h2>
                     </div>
-                    
-                    <form id="payment-form" method="POST">
+                    <div class="dog-preview">
+                        <div class="dog-image-large">
+                            {% if dog.image_url %}
+                            <img src="{{ dog.image_url }}" alt="{{ dog.name }}" class="dog-img">
+                            {% else %}
+                            <div class="image-placeholder">
+                                <span class="placeholder-icon">🐕</span>
+                            </div>
+                            {% endif %}
+                            <div class="availability-badge available">Available</div>
+                        </div>
+                        <div class="dog-details">
+                            <h3 class="dog-name">{{ dog.name }}</h3>
+                            <p class="dog-breed">{{ dog.breed }}</p>
+                            <div class="dog-specs">
+                                <div class="spec-item">
+                                    <span class="spec-icon">📅</span>
+                                    <span>{{ dog.age }} year{{ 's' if dog.age != 1 }} old</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-icon">📏</span>
+                                    <span>{{ dog.size|title }}</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-icon">⚡</span>
+                                    <span>{{ dog.energy_level|title }} Energy</span>
+                                </div>
+                                <div class="spec-item">
+                                    <span class="spec-icon">🎨</span>
+                                    <span>{{ dog.color }}</span>
+                                </div>
+                            </div>
+                            <div class="dog-description">
+                                <p>{{ dog.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Price Breakdown -->
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h3>💰 Price Breakdown</h3>
+                    </div>
+                    <div class="price-breakdown">
+                        <div class="price-item">
+                            <div class="price-label">
+                                <span>Adoption Fee</span>
+                                <small>Covers vaccinations, deworming, and care</small>
+                            </div>
+                            <div class="price-amount">KES {{ "{:,.0f}".format(dog.price) }}</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">
+                                <span>Delivery Service</span>
+                                <small>Free nationwide delivery</small>
+                            </div>
+                            <div class="price-amount">KES 0</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">
+                                <span>Starter Kit</span>
+                                <small>Food, leash, and care guide</small>
+                            </div>
+                            <div class="price-amount">KES 0</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">
+                                <span>Health Certificate</span>
+                                <small>Vaccination and health records</small>
+                            </div>
+                            <div class="price-amount">KES 0</div>
+                        </div>
+                        <div class="price-total">
+                            <div class="total-label">
+                                <strong>Total Amount</strong>
+                                <small>One-time adoption fee</small>
+                            </div>
+                            <div class="total-amount">KES {{ "{:,.0f}".format(dog.price) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adoption Process -->
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h3>📋 Adoption Journey</h3>
+                    </div>
+                    <div class="process-timeline">
+                        <div class="process-step current">
+                            <div class="step-icon">1</div>
+                            <div class="step-content">
+                                <h4>Complete Payment</h4>
+                                <p>Secure your new companion with M-Pesa payment</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">2</div>
+                            <div class="step-content">
+                                <h4>Verification</h4>
+                                <p>Our team verifies your adoption application</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">3</div>
+                            <div class="step-content">
+                                <h4>Schedule Delivery</h4>
+                                <p>Choose pickup or schedule home delivery</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">4</div>
+                            <div class="step-content">
+                                <h4>Welcome Home</h4>
+                                <p>Meet your new best friend and sign adoption papers</p>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">5</div>
+                            <div class="step-content">
+                                <h4>Lifetime Support</h4>
+                                <p>24/7 access to our veterinary and training support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Payment Form -->
+            <div class="checkout-right">
+                <!-- Payment Form -->
+                <div class="payment-card">
+                    <div class="card-header">
+                        <h2>💳 Complete Your Adoption</h2>
+                        <p>Secure payment via M-Pesa</p>
+                    </div>
+
+                    <!-- M-Pesa Instructions -->
+                    <div class="mpesa-guide">
+                        <div class="guide-header">
+                            <div class="guide-icon">📱</div>
+                            <h4>M-Pesa Payment Guide</h4>
+                        </div>
+                        <div class="guide-steps">
+                            <div class="guide-step">
+                                <span class="step-number">1</span>
+                                <span>Enter your M-Pesa registered number</span>
+                            </div>
+                            <div class="guide-step">
+                                <span class="step-number">2</span>
+                                <span>Click "Pay with M-Pesa" button</span>
+                            </div>
+                            <div class="guide-step">
+                                <span class="step-number">3</span>
+                                <span>Check phone for STK push prompt</span>
+                            </div>
+                            <div class="guide-step">
+                                <span class="step-number">4</span>
+                                <span>Enter your M-Pesa PIN to complete</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form id="payment-form" method="POST" class="payment-form">
                         <input type="hidden" name="dog_id" value="{{ dog.id }}">
                         <input type="hidden" name="amount" value="{{ dog.price }}">
-                        <input type="hidden" name="email" value="{{ current_user.email }}">
-                        <input type="hidden" name="first_name" value="{{ current_user.first_name }}">
-                        <input type="hidden" name="last_name" value="{{ current_user.last_name }}">
-                        
-                        <div class="form-group">
-                            <label for="mpesa_number">M-Pesa Phone Number</label>
-                            <input type="tel" id="mpesa_number" name="mpesa_number" 
-                                   placeholder="254712345678" required 
-                                   pattern="254[17]\d{8}" 
-                                   title="Enter a valid Kenyan phone number starting with 254"
-                                   value="{{ current_user.phone }}">
-                            <small style="color: #666;">Format: 254712345678</small>
+
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h4>👤 Your Information</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="first_name">First Name</label>
+                                    <input type="text" id="first_name" name="first_name" 
+                                           value="{{ current_user.first_name }}" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name">Last Name</label>
+                                    <input type="text" id="last_name" name="last_name" 
+                                           value="{{ current_user.last_name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" 
+                                       value="{{ current_user.email }}" readonly>
+                            </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="delivery_address">Delivery Address (Optional)</label>
-                            <textarea id="delivery_address" name="delivery_address" 
-                                      rows="3" placeholder="Enter your address for delivery arrangements..."></textarea>
+
+                        <!-- M-Pesa Payment -->
+                        <div class="form-section">
+                            <h4>📱 M-Pesa Details</h4>
+                            <div class="form-group">
+                                <label for="mpesa_number">M-Pesa Phone Number *</label>
+                                <div class="input-with-prefix">
+                                    <span class="prefix">+254</span>
+                                    <input type="tel" id="mpesa_number" name="mpesa_number" 
+                                           placeholder="712345678" required 
+                                           pattern="[17]\d{8}" 
+                                           title="Enter your M-Pesa number without 254"
+                                           value="{{ current_user.phone[3:] if current_user.phone and current_user.phone.startswith('254') else current_user.phone }}">
+                                </div>
+                                <small class="helper-text">Enter your M-Pesa registered number (without +254)</small>
+                            </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="special_instructions">Special Instructions (Optional)</label>
-                            <textarea id="special_instructions" name="special_instructions" 
-                                      rows="2" placeholder="Any special requirements or notes..."></textarea>
+
+                        <!-- Delivery Options -->
+                        <div class="form-section">
+                            <h4>🚚 Delivery Preferences</h4>
+                            <div class="delivery-options">
+                                <label class="option-radio">
+                                    <input type="radio" name="delivery_option" value="pickup" checked>
+                                    <span class="radio-label">
+                                        <strong>Pickup from Woofcare Center</strong>
+                                        <small>Nairobi CBD • Free • Available immediately</small>
+                                    </span>
+                                </label>
+                                <label class="option-radio">
+                                    <input type="radio" name="delivery_option" value="delivery">
+                                    <span class="radio-label">
+                                        <strong>Home Delivery</strong>
+                                        <small>Nationwide • Free • 2-3 business days</small>
+                                    </span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-group" id="delivery-address-group" style="display: none;">
+                                <label for="delivery_address">Delivery Address *</label>
+                                <textarea id="delivery_address" name="delivery_address" 
+                                          rows="3" placeholder="Enter your complete address for delivery..."></textarea>
+                            </div>
                         </div>
-                        
-                        <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem; padding: 15px;">
-                            Pay with M-Pesa - KES {{ "{:,.0f}".format(dog.price) }}
+
+                        <!-- Additional Information -->
+                        <div class="form-section">
+                            <h4>📝 Additional Information</h4>
+                            <div class="form-group">
+                                <label for="preferred_date">Preferred Pickup/Delivery Date</label>
+                                <input type="date" id="preferred_date" name="preferred_date" 
+                                       min="{{ today }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="special_instructions">Special Instructions</label>
+                                <textarea id="special_instructions" name="special_instructions" 
+                                          rows="3" placeholder="Any special requirements, timing preferences, or notes for our team..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Terms & Conditions -->
+                        <div class="form-section">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="terms_agreement" name="terms_agreement" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="#" target="_blank">Adoption Terms & Conditions</a> and understand that this is a lifetime commitment to care for {{ dog.name }}.
+                            </label>
+                        </div>
+
+                        <!-- Payment Button -->
+                        <button type="submit" class="payment-button" id="submit-button">
+                            <div class="button-content">
+                                <span class="button-icon">💳</span>
+                                <span class="button-text">
+                                    <strong>Pay with M-Pesa</strong>
+                                    <small>KES {{ "{:,.0f}".format(dog.price) }}</small>
+                                </span>
+                            </div>
                         </button>
+
+                        <div class="payment-security">
+                            <div class="security-badges">
+                                <span class="badge">🔒 SSL Secure</span>
+                                <span class="badge">📱 M-Pesa Verified</span>
+                                <span class="badge">🏥 Health Guarantee</span>
+                            </div>
+                        </div>
                     </form>
                 </div>
-                
-                <!-- Contact Information -->
-                <div class="form-container" style="margin-top: 1.5rem; text-align: center;">
-                    <h4>Need Help?</h4>
-                    <p>Contact our adoption team:</p>
-                    <p>📞 <strong>+254 700 000000</strong></p>
-                    <p>✉️ <strong>adoptions@woofcare.com</strong></p>
+
+                <!-- Support Information -->
+                <div class="support-card">
+                    <div class="support-header">
+                        <div class="support-icon">💬</div>
+                        <h4>Need Assistance?</h4>
+                    </div>
+                    <div class="support-content">
+                        <div class="support-item">
+                            <span class="item-icon">📞</span>
+                            <div class="item-content">
+                                <strong>Call Us</strong>
+                                <span>+254 700 123 456</span>
+                            </div>
+                        </div>
+                        <div class="support-item">
+                            <span class="item-icon">✉️</span>
+                            <div class="item-content">
+                                <strong>Email Us</strong>
+                                <span>adoptions@woofcare.com</span>
+                            </div>
+                        </div>
+                        <div class="support-item">
+                            <span class="item-icon">🕒</span>
+                            <div class="item-content">
+                                <strong>Support Hours</strong>
+                                <span>24/7 Adoption Support</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="support-guarantee">
+                        <h5>✅ Our Guarantee</h5>
+                        <ul>
+                            <li>30-Day Health Guarantee</li>
+                            <li>Secure M-Pesa Payments</li>
+                            <li>Free Nationwide Delivery</li>
+                            <li>Lifetime Support</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/payments.js') }}"></script>
+<style>
+.checkout-container {
+    padding: 2rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+/* Progress Steps */
+.checkout-progress {
+    max-width: 800px;
+    margin: 0 auto 3rem auto;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: #e9ecef;
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    border: 3px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.step-label {
+    font-weight: 500;
+    color: #6c757d;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.step.active .step-label {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Checkout Grid */
+.checkout-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Cards */
+.summary-card,
+.payment-card,
+.support-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.card-header h2,
+.card-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.card-header p {
+    margin: 0.5rem 0 0 0;
+    color: #6c757d;
+}
+
+/* Dog Preview */
+.dog-preview {
+    padding: 1.5rem;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.dog-image-large {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.dog-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+}
+
+.image-placeholder {
+    width: 150px;
+    height: 150px;
+    background: var(--secondary-color);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 3px solid var(--primary-color);
+}
+
+.placeholder-icon {
+    font-size: 3rem;
+    opacity: 0.7;
+}
+
+.availability-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--success-color);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.dog-details {
+    flex: 1;
+}
+
+.dog-name {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.dog-breed {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+.dog-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--secondary-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.spec-icon {
+    font-size: 1.1rem;
+}
+
+.dog-description {
+    color: #666;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* Price Breakdown */
+.price-breakdown {
+    padding: 1.5rem;
+}
+
+.price-item,
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.price-total {
+    border-bottom: none;
+    border-top: 2px solid var(--primary-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.price-label {
+    display: flex;
+    flex-direction: column;
+}
+
+.price-label small {
+    color: #6c757d;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
+}
+
+.price-amount {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.total-amount {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Process Timeline */
+.process-timeline {
+    padding: 1.5rem;
+}
+
+.process-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-left: 3px solid #e9ecef;
+    margin-left: 1rem;
+    padding-left: 1rem;
+}
+
+.process-step.current {
+    border-left-color: var(--primary-color);
+}
+
+.process-step.current .step-icon {
+    background: var(--primary-color);
+    color: white;
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.step-content h4 {
+    margin: 0 0 0.3rem 0;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.step-content p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* M-Pesa Guide */
+.mpesa-guide {
+    background: #e8f5e8;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.5rem;
+}
+
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.guide-icon {
+    font-size: 1.5rem;
+}
+
+.guide-header h4 {
+    margin: 0;
+    color: #2d5016;
+}
+
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.guide-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.step-number {
+    width: 25px;
+    height: 25px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+/* Form Styles */
+.payment-form {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h4 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.form-group input[readonly] {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.helper-text {
+    display: block;
+    margin-top: 0.3rem;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* Input with Prefix */
+.input-with-prefix {
+    display: flex;
+    align-items: center;
+}
+
+.prefix {
+    padding: 0.8rem 0.8rem 0.8rem 1rem;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.input-with-prefix input {
+    border-radius: 0 8px 8px 0;
+    flex: 1;
+}
+
+/* Delivery Options */
+.delivery-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.option-radio {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-radio:hover {
+    border-color: var(--primary-color);
+}
+
+.option-radio input[type="radio"]:checked + .radio-label {
+    color: var(--primary-color);
+}
+
+.option-radio input[type="radio"]:checked {
+    border-color: var(--primary-color);
+}
+
+.radio-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.radio-label strong {
+    font-weight: 600;
+}
+
+.radio-label small {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+/* Checkbox */
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-top: 0.2rem;
+}
+
+.checkbox-label a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.checkbox-label a:hover {
+    text-decoration: underline;
+}
+
+/* Payment Button */
+.payment-button {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1.2rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 1rem;
+}
+
+.payment-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 115, 85, 0.3);
+}
+
+.button-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.button-icon {
+    font-size: 1.5rem;
+}
+
+.button-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button-text small {
+    font-weight: 400;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+/* Security Badges */
+.payment-security {
+    text-align: center;
+}
+
+.security-badges {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    background: var(--secondary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Support Card */
+.support-card {
+    padding: 1.5rem;
+}
+
+.support-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.support-icon {
+    font-size: 1.5rem;
+}
+
+.support-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+}
+
+.support-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.support-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: var(--secondary-color);
+    border-radius: 8px;
+}
+
+.item-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.item-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-content strong {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.item-content span {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.support-guarantee h5 {
+    margin-bottom: 0.8rem;
+    color: var(--primary-color);
+}
+
+.support-guarantee ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.support-guarantee li {
+    padding: 0.3rem 0;
+    color: #666;
+    font-size: 0.9rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.support-guarantee li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .checkout-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .dog-preview {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .dog-image-large {
+        align-self: center;
+    }
+    
+    .dog-specs {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 1rem 0;
+    }
+    
+    .progress-steps {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .progress-steps::before {
+        display: none;
+    }
+    
+    .step {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    
+    .step-number {
+        margin-bottom: 0;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dog-img,
+    .image-placeholder {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-header,
+    .dog-preview,
+    .price-breakdown,
+    .process-timeline,
+    .payment-form,
+    .support-card {
+        padding: 1rem;
+    }
+    
+    .mpesa-guide {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .button-content {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Delivery option toggle
+    const deliveryOptions = document.querySelectorAll('input[name="delivery_option"]');
+    const deliveryAddressGroup = document.getElementById('delivery-address-group');
+    
+    deliveryOptions.forEach(option => {
+        option.addEventListener('change', function() {
+            if (this.value === 'delivery') {
+                deliveryAddressGroup.style.display = 'block';
+                document.getElementById('delivery_address').required = true;
+            } else {
+                deliveryAddressGroup.style.display = 'none';
+                document.getElementById('delivery_address').required = false;
+            }
+        });
+    });
+    
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('preferred_date');
+    if (dateInput) {
+        dateInput.min = today;
+    }
+    
+    // Form validation
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Validate M-Pesa number
+        const mpesaNumber = document.getElementById('mpesa_number').value;
+        const mpesaRegex = /^[17]\d{8}$/;
+        
+        if (!mpesaRegex.test(mpesaNumber)) {
+            alert('Please enter a valid M-Pesa number (e.g., 712345678)');
+            return;
+        }
+        
+        // Validate terms agreement
+        const termsAgreed = document.getElementById('terms_agreement').checked;
+        if (!termsAgreed) {
+            alert('Please agree to the adoption terms and conditions');
+            return;
+        }
+        
+        // Show loading state
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+            <div class="button-content">
+                <span class="button-icon">⏳</span>
+                <span class="button-text">
+                    <strong>Processing Payment...</strong>
+                    <small>Please wait</small>
+                </span>
+            </div>
+        `;
+        
+        // Submit form
+        this.submit();
+    });
+    
+    // Format M-Pesa number input
+    const mpesaInput = document.getElementById('mpesa_number');
+    mpesaInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        // Remove 254 prefix if user enters it
+        if (value.startsWith('254')) {
+            value = value.substring(3);
+        }
+        
+        // Limit to 9 digits
+        if (value.length > 9) {
+            value = value.substring(0, 9);
+        }
+        
+        e.target.value = value;
+    });
+});
+</script>
 {% endblock %}

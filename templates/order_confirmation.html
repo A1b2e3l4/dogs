@@ -1,0 +1,1201 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="container">
+        <!-- Success Header -->
+        <div class="success-header">
+            <div class="success-icon">
+                <div class="icon-circle">
+                    <span class="icon">🎉</span>
+                </div>
+            </div>
+            <h1 class="success-title">Adoption Confirmed!</h1>
+            <p class="success-subtitle">Welcome to the Woofcare Family!</p>
+            <div class="confirmation-badge">
+                Order #{{ order.id[:8] }}...
+            </div>
+        </div>
+
+        <div class="confirmation-grid">
+            <!-- Left Column - Order Details -->
+            <div class="confirmation-left">
+                <!-- Adoption Success Card -->
+                <div class="success-card">
+                    <div class="card-header">
+                        <h2>🐕 Meet Your New Best Friend!</h2>
+                    </div>
+                    <div class="adoption-success">
+                        <div class="dog-celebration">
+                            <div class="dog-image-large">
+                                {% if order.dog.image_url %}
+                                <img src="{{ order.dog.image_url }}" alt="{{ order.dog.name }}" class="celebrating-dog">
+                                {% else %}
+                                <div class="image-placeholder-celebrate">
+                                    <span class="placeholder-icon">🐕</span>
+                                </div>
+                                {% endif %}
+                                <div class="celebration-overlay">
+                                    <span class="celebrate-text">Adopted! 🏠</span>
+                                </div>
+                            </div>
+                            <div class="dog-welcome">
+                                <h3>Welcome Home, {{ order.dog.name }}! 🎉</h3>
+                                <p class="welcome-message">
+                                    Congratulations on adopting your new companion! {{ order.dog.name }} is now part of your family, 
+                                    and we're thrilled to see them find their forever home.
+                                </p>
+                                <div class="welcome-stats">
+                                    <div class="welcome-stat">
+                                        <span class="stat-icon">📅</span>
+                                        <span class="stat-text">Adopted on {{ order.created_at.strftime('%B %d, %Y') }}</span>
+                                    </div>
+                                    <div class="welcome-stat">
+                                        <span class="stat-icon">⏰</span>
+                                        <span class="stat-text">{{ order.created_at.strftime('%I:%M %p') }}</span>
+                                    </div>
+                                    <div class="welcome-stat">
+                                        <span class="stat-icon">👤</span>
+                                        <span class="stat-text">Adopted by {{ current_user.first_name }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="steps-card">
+                    <div class="card-header">
+                        <h2>📋 What Happens Next?</h2>
+                    </div>
+                    <div class="process-timeline">
+                        <div class="process-step completed">
+                            <div class="step-icon">✓</div>
+                            <div class="step-content">
+                                <h4>Payment Confirmed</h4>
+                                <p>Your M-Pesa payment of KES {{ "{:,.0f}".format(order.amount) }} has been processed successfully</p>
+                                <span class="step-time">Completed</span>
+                            </div>
+                        </div>
+                        <div class="process-step current">
+                            <div class="step-icon">2</div>
+                            <div class="step-content">
+                                <h4>Adoption Verification</h4>
+                                <p>Our team is reviewing your adoption application (1-2 hours)</p>
+                                <span class="step-time">In Progress</span>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">3</div>
+                            <div class="step-content">
+                                <h4>Schedule Delivery</h4>
+                                <p>Choose pickup time or schedule home delivery</p>
+                                <span class="step-time">Pending</span>
+                            </div>
+                        </div>
+                        <div class="process-step">
+                            <div class="step-icon">4</div>
+                            <div class="step-content">
+                                <h4>Welcome Home</h4>
+                                <p>Meet {{ order.dog.name }} and complete adoption paperwork</p>
+                                <span class="step-time">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Adoption Documents -->
+                <div class="documents-card">
+                    <div class="card-header">
+                        <h2>📄 Adoption Documents</h2>
+                    </div>
+                    <div class="documents-list">
+                        <div class="document-item">
+                            <div class="doc-icon">📋</div>
+                            <div class="doc-content">
+                                <h4>Adoption Certificate</h4>
+                                <p>Official certificate of adoption for {{ order.dog.name }}</p>
+                            </div>
+                            <button class="doc-button" onclick="downloadCertificate()">Download</button>
+                        </div>
+                        <div class="document-item">
+                            <div class="doc-icon">🏥</div>
+                            <div class="doc-content">
+                                <h4>Health Records</h4>
+                                <p>Vaccination history and medical records</p>
+                            </div>
+                            <button class="doc-button" onclick="downloadHealthRecords()">Download</button>
+                        </div>
+                        <div class="document-item">
+                            <div class="doc-icon">📖</div>
+                            <div class="doc-content">
+                                <h4>Care Guide</h4>
+                                <p>Complete care instructions and training tips</p>
+                            </div>
+                            <button class="doc-button" onclick="downloadCareGuide()">Download</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Order Summary & Support -->
+            <div class="confirmation-right">
+                <!-- Order Summary -->
+                <div class="summary-card">
+                    <div class="card-header">
+                        <h2>💰 Order Summary</h2>
+                    </div>
+                    <div class="order-details">
+                        <div class="detail-section">
+                            <h4>Order Information</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Order ID:</span>
+                                <span class="detail-value">{{ order.id }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Order Date:</span>
+                                <span class="detail-value">{{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status:</span>
+                                <span class="status-badge {{ order.status }}">{{ order.status|title }}</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>Payment Details</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Payment Method:</span>
+                                <span class="detail-value">M-Pesa</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Phone Number:</span>
+                                <span class="detail-value">{{ order.mpesa_number }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Transaction ID:</span>
+                                <span class="detail-value">
+                                    {% if order.transaction_id %}
+                                        {{ order.transaction_id[:15] }}...
+                                    {% else %}
+                                        Processing...
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h4>Adoption Summary</h4>
+                            <div class="adoption-item">
+                                <div class="adoption-dog">
+                                    <div class="dog-thumb">
+                                        {% if order.dog.image_url %}
+                                        <img src="{{ order.dog.image_url }}" alt="{{ order.dog.name }}">
+                                        {% else %}
+                                        <span>🐕</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="dog-info">
+                                        <strong>{{ order.dog.name }}</strong>
+                                        <span>{{ order.dog.breed }}</span>
+                                    </div>
+                                </div>
+                                <div class="adoption-price">
+                                    KES {{ "{:,.0f}".format(order.amount) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="price-total">
+                            <div class="total-label">
+                                <strong>Total Paid</strong>
+                            </div>
+                            <div class="total-amount">
+                                KES {{ "{:,.0f}".format(order.amount) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="actions-card">
+                    <div class="card-header">
+                        <h2>🚀 Quick Actions</h2>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('account') }}" class="action-btn primary">
+                            <span class="btn-icon">📱</span>
+                            <span class="btn-text">
+                                <strong>View in Account</strong>
+                                <small>Track adoption progress</small>
+                            </span>
+                        </a>
+                        <button class="action-btn" onclick="shareAdoption()">
+                            <span class="btn-icon">📤</span>
+                            <span class="btn-text">
+                                <strong>Share News</strong>
+                                <small>Tell friends & family</small>
+                            </span>
+                        </button>
+                        <a href="{{ url_for('dogs') }}" class="action-btn">
+                            <span class="btn-icon">🐕</span>
+                            <span class="btn-text">
+                                <strong>Browse More</strong>
+                                <small>Meet other dogs</small>
+                            </span>
+                        </a>
+                        <a href="mailto:support@woofcare.com" class="action-btn">
+                            <span class="btn-icon">💬</span>
+                            <span class="btn-text">
+                                <strong>Get Help</strong>
+                                <small>Contact support</small>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Support & Resources -->
+                <div class="support-card">
+                    <div class="card-header">
+                        <h2>💝 Welcome to Woofcare Family!</h2>
+                    </div>
+                    <div class="support-content">
+                        <div class="welcome-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-icon">🏥</span>
+                                <div class="benefit-content">
+                                    <strong>30-Day Health Guarantee</strong>
+                                    <span>Full medical support included</span>
+                                </div>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">📞</span>
+                                <div class="benefit-content">
+                                    <strong>24/7 Vet Support</strong>
+                                    <span>Always here to help</span>
+                                </div>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">🎓</span>
+                                <div class="benefit-content">
+                                    <strong>Training Resources</strong>
+                                    <span>Free access to experts</span>
+                                </div>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-icon">👥</span>
+                                <div class="benefit-content">
+                                    <strong>Community Access</strong>
+                                    <span>Join other pet parents</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="support-contact">
+                            <h4>Need Immediate Help?</h4>
+                            <div class="contact-methods">
+                                <div class="contact-method">
+                                    <span class="method-icon">📞</span>
+                                    <div class="method-info">
+                                        <strong>Call Us</strong>
+                                        <span>+254 700 123 456</span>
+                                    </div>
+                                </div>
+                                <div class="contact-method">
+                                    <span class="method-icon">✉️</span>
+                                    <div class="method-info">
+                                        <strong>Email Us</strong>
+                                        <span>support@woofcare.com</span>
+                                    </div>
+                                </div>
+                                <div class="contact-method">
+                                    <span class="method-icon">💬</span>
+                                    <div class="method-info">
+                                        <strong>Live Chat</strong>
+                                        <span>Available 24/7</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Celebration Share -->
+                <div class="celebration-card">
+                    <div class="celebration-content">
+                        <h3>🎉 Share the Joy!</h3>
+                        <p>Let friends and family know about your new family member</p>
+                        <div class="share-buttons">
+                            <button class="share-btn facebook" onclick="shareOnFacebook()">
+                                <span>📘 Facebook</span>
+                            </button>
+                            <button class="share-btn twitter" onclick="shareOnTwitter()">
+                                <span>🐦 Twitter</span>
+                            </button>
+                            <button class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+                                <span>💬 WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="final-cta">
+            <div class="cta-content">
+                <h2>Ready to Welcome {{ order.dog.name }} Home? 🏠</h2>
+                <p>Our adoption team will contact you within 2 hours to schedule pickup/delivery</p>
+                <div class="cta-actions">
+                    <a href="{{ url_for('account') }}" class="btn btn-primary btn-large">
+                        📱 Track Adoption Progress
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary btn-large">
+                        🏠 Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.confirmation-container {
+    padding: 2rem 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+}
+
+/* Success Header */
+.success-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.success-icon {
+    margin-bottom: 1.5rem;
+}
+
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--success-color), #28a745);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-10px);}
+    60% {transform: translateY(-5px);}
+}
+
+.icon {
+    font-size: 3rem;
+}
+
+.success-title {
+    font-size: 2.5rem;
+    color: var(--success-color);
+    margin-bottom: 0.5rem;
+}
+
+.success-subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 1rem;
+}
+
+.confirmation-badge {
+    display: inline-block;
+    background: var(--primary-color);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Confirmation Grid */
+.confirmation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Cards */
+.success-card,
+.steps-card,
+.documents-card,
+.summary-card,
+.actions-card,
+.support-card,
+.celebration-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.card-header h2 {
+    margin: 0;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Adoption Success */
+.adoption-success {
+    padding: 1.5rem;
+}
+
+.dog-celebration {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.dog-image-large {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.celebrating-dog {
+    width: 150px;
+    height: 150px;
+    border-radius: 15px;
+    object-fit: cover;
+    border: 4px solid var(--success-color);
+}
+
+.image-placeholder-celebrate {
+    width: 150px;
+    height: 150px;
+    background: var(--secondary-color);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid var(--success-color);
+}
+
+.placeholder-icon {
+    font-size: 3rem;
+    opacity: 0.7;
+}
+
+.celebration-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--success-color);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.dog-welcome h3 {
+    margin: 0 0 1rem 0;
+    color: var(--text-color);
+    font-size: 1.4rem;
+}
+
+.welcome-message {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-stats {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.welcome-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--secondary-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.stat-icon {
+    font-size: 1.1rem;
+}
+
+/* Process Timeline */
+.process-timeline {
+    padding: 1.5rem;
+}
+
+.process-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-left: 3px solid #e9ecef;
+    margin-left: 1rem;
+    padding-left: 1rem;
+    position: relative;
+}
+
+.process-step.completed {
+    border-left-color: var(--success-color);
+}
+
+.process-step.current {
+    border-left-color: var(--primary-color);
+}
+
+.process-step.completed .step-icon {
+    background: var(--success-color);
+    color: white;
+}
+
+.process-step.current .step-icon {
+    background: var(--primary-color);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.step-content h4 {
+    margin: 0 0 0.3rem 0;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.step-content p {
+    margin: 0 0 0.5rem 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.step-time {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* Documents */
+.documents-list {
+    padding: 1.5rem;
+}
+
+.document-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.document-item:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.doc-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.doc-content {
+    flex: 1;
+}
+
+.doc-content h4 {
+    margin: 0 0 0.3rem 0;
+    color: var(--text-color);
+}
+
+.doc-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.doc-button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s ease;
+}
+
+.doc-button:hover {
+    background: var(--primary-dark);
+}
+
+/* Order Details */
+.order-details {
+    padding: 1.5rem;
+}
+
+.detail-section {
+    margin-bottom: 2rem;
+}
+
+.detail-section h4 {
+    margin: 0 0 1rem 0;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.detail-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-badge.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.completed {
+    background: var(--success-color);
+    color: white;
+}
+
+/* Adoption Item */
+.adoption-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border-radius: 10px;
+}
+
+.adoption-dog {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dog-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--secondary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dog-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dog-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.dog-info strong {
+    color: var(--text-color);
+}
+
+.dog-info span {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.adoption-price {
+    font-weight: bold;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.price-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0 0 0;
+    border-top: 2px solid var(--primary-color);
+    margin-top: 1rem;
+}
+
+.total-label strong {
+    font-size: 1.2rem;
+    color: var(--text-color);
+}
+
+.total-amount {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Action Buttons */
+.action-buttons {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.action-btn:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.action-btn.primary {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.btn-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.btn-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.btn-text strong {
+    font-size: 1rem;
+}
+
+.btn-text small {
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+/* Support Content */
+.support-content {
+    padding: 1.5rem;
+}
+
+.welcome-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border-radius: 10px;
+}
+
+.benefit-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.benefit-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.benefit-content strong {
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.benefit-content span {
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.support-contact h4 {
+    margin: 0 0 1rem 0;
+    color: var(--primary-color);
+}
+
+.contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contact-method {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    background: var(--secondary-color);
+    border-radius: 8px;
+}
+
+.method-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.method-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.method-info strong {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.method-info span {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Celebration Card */
+.celebration-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    text-align: center;
+}
+
+.celebration-content {
+    padding: 2rem 1.5rem;
+}
+
+.celebration-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+}
+
+.celebration-content p {
+    margin: 0 0 1.5rem 0;
+    opacity: 0.9;
+}
+
+.share-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.share-btn {
+    padding: 0.8rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.share-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+}
+
+/* Final CTA */
+.final-cta {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-top: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.cta-content h2 {
+    margin: 0 0 1rem 0;
+    color: var(--primary-color);
+    font-size: 2rem;
+}
+
+.cta-content p {
+    margin: 0 0 2rem 0;
+    color: #666;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .confirmation-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .dog-celebration {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .dog-image-large {
+        align-self: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .confirmation-container {
+        padding: 1rem 0;
+    }
+    
+    .success-title {
+        font-size: 2rem;
+    }
+    
+    .dog-celebration {
+        gap: 1rem;
+    }
+    
+    .celebrating-dog,
+    .image-placeholder-celebrate {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .welcome-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cta-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .share-buttons {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-header,
+    .adoption-success,
+    .process-timeline,
+    .documents-list,
+    .order-details,
+    .action-buttons,
+    .support-content,
+    .celebration-content {
+        padding: 1rem;
+    }
+    
+    .success-header {
+        padding: 1.5rem 1rem;
+    }
+    
+    .final-cta {
+        padding: 2rem 1rem;
+    }
+    
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .icon {
+        font-size: 2.5rem;
+    }
+}
+</style>
+
+<script>
+function downloadCertificate() {
+    alert('Adoption certificate download would start for ' + '{{ order.dog.name }}');
+    // In a real app, this would trigger a PDF download
+}
+
+function downloadHealthRecords() {
+    alert('Health records download would start for ' + '{{ order.dog.name }}');
+    // In a real app, this would trigger a PDF download
+}
+
+function downloadCareGuide() {
+    alert('Care guide download would start');
+    // In a real app, this would trigger a PDF download
+}
+
+function shareAdoption() {
+    const message = `I just adopted {{ order.dog.name }} from Woofcare! 🐕🎉 So excited to welcome my new furry friend home! #WoofcareAdoption`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'I Adopted {{ order.dog.name }}!',
+            text: message,
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(message).then(() => {
+            alert('Adoption message copied to clipboard! 📋');
+        });
+    }
+}
+
+function shareOnFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent('I just adopted {{ order.dog.name }} from Woofcare! 🐕');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
+}
+
+function shareOnTwitter() {
+    const text = encodeURIComponent('I just adopted {{ order.dog.name }} from @Woofcare! 🐕🎉 #DogAdoption #Woofcare');
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+}
+
+function shareOnWhatsApp() {
+    const text = encodeURIComponent(`I just adopted {{ order.dog.name }} from Woofcare! 🐕🎉 So excited to welcome my new furry friend home! Check it out: ${window.location.href}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+// Add confetti effect for celebration
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple confetti effect
+    setTimeout(() => {
+        createConfetti();
+    }, 1000);
+});
+
+function createConfetti() {
+    const confettiCount = 100;
+    const confettiContainer = document.createElement('div');
+    confettiContainer.style.position = 'fixed';
+    confettiContainer.style.top = '0';
+    confettiContainer.style.left = '0';
+    confettiContainer.style.width = '100%';
+    confettiContainer.style.height = '100%';
+    confettiContainer.style.pointerEvents = 'none';
+    confettiContainer.style.zIndex = '9999';
+    document.body.appendChild(confettiContainer);
+
+    for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.innerHTML = ['🎉', '🎊', '🐕', '🐶', '🏠', '❤️'][Math.floor(Math.random() * 6)];
+        confetti.style.position = 'absolute';
+        confetti.style.fontSize = Math.random() * 20 + 10 + 'px';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = '-50px';
+        confetti.style.opacity = Math.random() * 0.5 + 0.5;
+        confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+        confettiContainer.appendChild(confetti);
+    }
+
+    // Remove confetti after animation
+    setTimeout(() => {
+        document.body.removeChild(confettiContainer);
+    }, 5000);
+}
+
+// Add CSS for confetti animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fall {
+        to {
+            transform: translateY(100vh) rotate(360deg);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
